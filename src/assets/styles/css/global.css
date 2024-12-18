@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+/* Importer Montserrat directement dans le CSS */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+
+.destinations{
+    background-color: #F8F8F8;
+  box-shadow: gray -1px 0px 1px;
+}
+
+.text-gray{
+  color:rgb(160, 160, 160);
+  font-size: 14px;
+  font-family: "poppins"
+}

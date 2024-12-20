@@ -1,5 +1,5 @@
 import React from 'react';
-import DestinationInfoTemplate from '../../../layout/destination-poup-up-template';
+import DestinationInfoTemplate from '../../layout/destination-poup-up-template';
 
 
 const DestinationReviewsPage = ()=>{

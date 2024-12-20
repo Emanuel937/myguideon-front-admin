@@ -3,7 +3,7 @@ import './App.css';
 import './components/headerComponent';
 import './assets/styles/css/global.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrownserRouter as Router, Routes, Route} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import routes from './routes/route';
 
 function App() {

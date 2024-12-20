@@ -13,3 +13,75 @@
   font-size: 14px;
   font-family: "poppins"
 }
+
+.body{
+  background-image: url('./../../../../public/assets/img/map.png');
+  height: 90vh;
+  position: relative;
+}
+.bg-black-transparent{
+  background-color: #0009;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+}
+
+.customer-modal{
+  width: 88%;
+  margin: auto;
+  height: 95%;
+  position:absolute;
+  top:50%;
+  top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+}
+
+.custom-modal-back{
+  
+}
+
+
+.custom-modal-back span{
+  /* Back to main */
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 600;
+font-size: 16px;
+line-height: 20px;
+/* identical to box height */
+
+color: #000000;
+
+mix-blend-mode: normal;
+opacity: 0.5;
+
+}
+
+.custom-modal-close{
+
+}
+
+.custom-modal-title h6{
+  /* USER REVIEWS & FEEDB */
+  top: 153px;
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 29px;
+  text-align: center;
+  color: #394149;
+
+
+}
+
+.display-flex{
+  display: flex;
+  justify-content:space-between;
+  padding: 30px;
+}

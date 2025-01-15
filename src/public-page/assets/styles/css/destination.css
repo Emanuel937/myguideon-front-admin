@@ -1,0 +1,935 @@
+#Mix{
+    padding-left: 35px;
+}
+.previwGaleryContainer{
+    padding-left: 35px;
+    padding-top: 30px;
+}
+
+h1, h2{
+    /* DESTINATION DETAILS */
+
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 29px;
+    color: #394149;
+}
+
+.smallPhoto{
+    width: 150px;
+    height: 150px;
+    border-radius:20px;
+}
+
+.smallPhoto img{
+    width: 100%;
+    object-fit: contain;
+    
+}
+
+
+.smallPhoto:hover{
+    transition: all 1s;
+  transform: scale3d(1.05, 1,1);
+}
+
+.bigPhoto{
+    width: 720px;
+    height: 215px;
+    max-height: 215px;
+    border-radius:20px;
+}
+.bigPhoto img{
+    object-fit: cover;
+    width: 100%;
+    height: 300px;
+    border-radius:20px;
+    
+}
+
+.info-container{
+   
+    height: 65px;
+    padding-right: 70px;
+    border-radius: 20px;
+    padding-left: 10px;
+    align-self: center;
+    margin-top:20px;
+    margin-right:15px;
+    background: linear-gradient(145deg, #fdf8ec, #e9d9b3);
+   filter: brightness(0.95);
+
+}
+
+.info-container img{
+    width: 34px;
+    height: 30px;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.info-container .small-title{
+    /* Currencies */
+    height: 17px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    /* identical to box height */
+
+    color: #000000;
+
+    mix-blend-mode: normal;
+    opacity: 0.5;
+    line-height: 2;
+
+}
+
+
+.info-container .small-description{
+    /* USD, GBP, EURO */
+    height: 15px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 15px;
+    /* identical to box height */
+    color: #000000;
+    line-height: 0px;
+}
+
+.meteo img{
+    width:1278px;
+    max-width: 1278px;
+    height: 190px;
+    border-radius: 40px;
+    margin-top:20px;
+
+}
+
+/* Container principal */
+.rating-container {
+    margin-left: 30px;
+    margin-top:20px;
+    width: 378px;
+    height: 167px;
+    background: linear-gradient(to bottom, #f7e35e, #f7b731);
+    border-radius: 50px;
+    padding: 20px;
+    box-shadow: gray 1px 2px 1px;
+  }
+  
+
+  .rating-container .icon{
+    width: 40px;
+    height: 40px;
+    left: 1007px;
+    top: 580px;
+
+
+  }
+  .rating-title{
+    width: 132px;
+    height: 22px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 509;
+    font-size: 18px;
+    line-height: 22px;
+    text-align: right;
+    color: #025F80;
+    padding-right: 20px;
+  }
+
+
+  .rating-score{
+    /* 4.3/5 */
+    width: 123px;
+    height: 59px;
+    padding-left: 12px;
+    padding-top: 6px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 49px;
+    /* identical to box height */
+    text-align: right;
+    color: #025F80;
+  }
+
+
+.sub-ratings-cotainer{
+
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 10;
+    width: 348px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    margin-top:10px
+
+}
+
+.rating-item{
+    padding-left: 40px;
+    padding-top:10px;
+    
+}
+
+.rating-iten-icon{
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+.rating-iten-note{
+    padding-right: 30px;
+    padding-right: 30px;
+  color: white;
+  font-weight: 800;
+
+}
+
+h3{
+    /* DESTINATION DETAILS */
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 18px;
+line-height: 29px;
+color: #394149;
+
+
+}
+h4{
+
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 29px;
+    color: #394149;
+}
+
+.explore-more{
+    width:165px;
+    margin-right: 20px;
+    margin-top:10px
+}
+.explore-more article{
+    width:165px;
+    height: 112px;
+    border:0.5px solid rgb(205, 205, 205);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+   
+}
+
+.explore-more article img{
+    max-width: 100px;
+    width: 100px;
+    height: 70px;
+    max-height: 70px;
+    object-fit: contain;
+}
+
+.expore-more-title{
+  /* Culture */
+/* Culture */
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 300;
+font-size: 14px;
+line-height: 20px;
+text-align: center;
+color: #394149;
+margin-top: 10px;
+}
+
+.back-icon{
+   
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 20px;
+    color: #000000;
+    margin-right: 10px;
+}
+
+.back-main{
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 20px;
+    color: #000000;
+    opacity: 0.5;
+    margin-right: 10px;
+    font-family: 'Montserrat';
+    font-size:12px
+}
+.overall_card{
+    width: 210px;
+    height: 123px;
+    color:white;
+    padding: 17px;
+    border-radius: 10px;
+    margin-right: 10px;
+    border:none;
+    box-shadow:  10px 20px 30px -16px rgba(0, 0, 0, 0.2);
+
+}
+.overall_title{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    font-family: 'Montserrat';
+    padding-top: 20px;
+    height: 20px;
+    padding-bottom: 7px;
+}
+
+.overall_note{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 9px;
+    text-align: right;
+    color: #FFFFFF;
+}
+
+
+.review_card{
+    margin-top:27px
+}
+
+.review-h4{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    /* identical to box height */
+    color: #3F3F44;
+
+}
+
+p.filter{
+
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 15px;
+    color: rgba(63, 63, 68, 0.7);
+
+}
+p.filter img{
+    margin-right: 5px;
+}
+
+p.photo{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    /* identical to box height, or 133% */
+    color: #3F3F44;
+ 
+    
+}
+
+.vertical_center_content{
+    display: flex;
+    align-items: center;
+    margin-top:20px;
+
+}
+
+.location.vertical_center_content{
+    flex-direction: column;
+}
+p.photo img{
+    width: 48px;
+    min-height: 48px;
+    object-fit: cover;
+    border-radius: 24px;
+    margin-right: 20px;
+
+   
+}
+.review-h5{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 15px;
+    color: #3F3F44;
+}
+
+
+.details_container{
+    background-color: #F6F6F6;
+    padding:10px;
+    border-radius: 10px;
+}
+
+.modal_container{
+    margin-left: 40px;
+}
+
+
+.location .name{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 15px;
+    /* identical to box height */
+    color: #3F3F44;
+}
+
+.location .city{
+
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 10px;
+line-height: 12px;
+
+color: rgba(63, 63, 68, 0.5);
+
+
+}
+
+
+.vertical_center_content.star{
+    flex-direction: column;
+    align-items: start;
+    margin-left: 10px;
+
+}
+
+.vertical_center_content.star p {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+
+    color: rgba(63, 63, 68, 0.6);
+
+
+}
+
+.vertical_center_content.star i.bi{
+   /* Frame */
+
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    color:#FDCB9E
+}
+
+.minHeight{
+    height: 70px;
+}
+
+.startHeight{
+    height: 0;
+}
+
+.vertical_center_content.star i.star-big {
+    font-size: 14px;
+  }
+
+.progress_content{
+    margin-left: 16px;
+    max-height: 16px;
+    height: 16px;
+    margin-bottom: 15px;
+    margin-top:15px
+}
+.progress{
+    width: 250px;
+    height: 10px;
+}
+
+.progress_content .start-single{
+    margin-top: -3px;
+}
+
+.details_container_container{
+    padding-right: 50px;
+    padding-left: 20px;
+}
+
+.start-single i.bi.bi-star-fill.star-big{
+    color:#fdcb9e
+}
+
+.starQTY {
+    /* 5 Star */
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 15px;
+color: #3F3F44;
+
+margin-left: 10px;
+margin-right:10px
+}
+.main-start .vertical_center_content.star p{
+    margin-top: -20px;
+    margin-left: -20px;
+}
+
+
+.maxMinHeight{
+    height: 60px;
+    max-height: 60px;
+}
+
+.avarage{
+    /* 4.3/5 */
+
+    height: 24px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+
+    color: #3F3F44;
+    margin-left: 10px;
+
+}
+
+
+
+/* categoires activity page design */
+
+.categories_sections{
+    border:1px solid #DFDFDF;
+    max-height: 65px;
+    height: 75px;
+    padding:20px;
+    border-radius: 38px;
+   line-height: 20px;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+.categories_icons{
+    height: 26px;
+    width: 26px;
+    margin-right: 10px;
+}
+.categories_name{
+    height: 20px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    color: #37414A;
+
+}
+
+
+
+.section_section_categoires{
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth; /* Défilement fluide */
+    -ms-overflow-style: none; /* Masquer la barre sur Internet Explorer */
+    scrollbar-width: none; /* Masquer la */
+}
+
+
+
+.section_section_categoires::-webkit-scrollbar {
+    display: none; /* Masquer la barre sur Chrome, Safari et Edge */
+}
+
+
+.section_section_categoires {
+    display: flex;
+    overflow-x: auto; /* Activer le défilement horizontal */
+    -ms-overflow-style: none; /* Masquer la scrollbar sur IE et Edge */
+    scrollbar-width: none; /* Masquer la scrollbar sur Firefox */
+    gap: 16px; /* Espacement entre les éléments */
+    padding: 10px; /* Ajout d'un padding pour éviter les débordements */
+
+}
+
+.containerActiviesCard{
+    width: 230px;
+    height: 209px;
+    border: 1px solid rgba(128, 128, 128, 0.335);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right:4.5%;
+    margin-bottom: 2%;
+   
+    
+}
+
+.section_section_categoires::-webkit-scrollbar {
+    display: none; /* Masquer la scrollbar sur Chrome, Safari et autres */
+}
+
+.categories_sections {
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    padding: 10px;
+    border-radius: 38px;
+    margin-right: 16px; /* Espacement entre les catégories */
+}
+
+
+
+.card_img{
+    height: 150px;
+}
+.containerActiviesCard img{
+    width: 100%;
+}
+
+
+.activity_name{
+    /* Scuba Diving */
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 20px;
+    color: #394149;
+
+}
+.card_information p:first-child{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 15px;
+    color: #000000;
+    padding: 4px;
+    padding-bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0px;
+    padding-top: 8px;
+    padding-bottom: 5px;
+}
+.card_information p {
+    height: 8px;
+
+}
+.card_information p i{
+    color:#FEC64F;
+    margin-right: 8px;
+   
+
+}
+
+.card_information p .rating{
+    font-weight: 500;
+}
+
+
+.card_information_grey_text{
+    font-family: 'Montserrat';
+    font-weight: 700;
+    font-size: 12px;
+    color: #999999;
+    padding: 4px;
+    padding-top:2px
+ 
+}
+
+.activity_price{
+    color:#007BFF;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.flex_card_container{
+    padding-left:20px
+}
+
+/**  GALERY PAGE ...*/
+
+.galeryPhotoCard{
+    width:180px ;
+    height: 180px;
+    border-radius: 10px;
+    border:0.50px solid rgba(128, 128, 128, 0.346);
+    overflow: hidden;
+    position: relative; 
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+   
+}
+
+
+.galeryPhotoCard .userPhoto{
+    position: absolute;
+    left: 72%;
+    bottom: 0;
+}
+
+.galeryPhotoCard .userPhoto img{
+    width: 40px;
+    height: 45px;
+    border-radius: 100%;
+    border: 4px solid white;
+}
+
+.center_gallery{
+    width: 60%;
+    border-radius: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow: hidden;
+    height: 48vh;
+}
+
+
+.center_gallery video{
+    width: 100%;
+}
+
+/* MAP DESTINATION ACTIVITY .....*/
+
+.map_section{
+    position:relative
+}
+
+.explore_mode{
+    border:3px solid #007BFF;
+    border-radius: 24px;
+    width: 208px;
+    color:white;
+    height: 40px;
+    position:absolute;
+    z-index:800;
+    top:82%;
+    left: 3%;
+    background-color:#5a7ca390;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    color: #FFFFFF;
+    padding-top:5px;
+    margin-left: 10px;
+
+
+}
+
+.explore_mode img{
+    width: 20px;
+    margin-left: 20px;
+    
+}
+
+.bottom_map_activity_menu{
+    border-radius: 24px;
+    width: 180px;
+    height: 40px;
+    position:absolute;
+    z-index:800;
+    top:82%;
+    background-color:white;
+    padding-top:10px;
+    right:0;
+    /* Activities */
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    /* identical to box height */
+    color: #3E4E7E;
+    text-align: right;
+    padding-right: 18px;
+    margin-right: 10px;
+ 
+
+
+}
+
+.bottom_map_activity_menu img{
+    position: absolute;
+    left: -10%;
+    top: -50%;
+}
+
+
+.map_back{
+    border-radius: 24px;
+    width: 280px;
+    height: 40px;
+    position:absolute;
+    z-index:800;
+    top:3%;
+    background-color:white;
+    padding-top:10px;
+    left:3%;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+    /* identical to box height */
+    color: #000000;
+    padding-bottom: 5px;
+    padding-left: 10px;
+   
+
+ 
+}
+
+.map_back img{
+    width: 17px;
+    margin-right: 10px;
+    margin-left: 10px;
+    
+}
+
+.leaflet-control-container .leaflet-left {
+    left:95%;
+  }
+
+
+  .leaflet-left .leaflet-control {
+
+    margin-left: 10px;
+    transform: rotate(270deg);
+    border:none
+  }
+
+  .leaflet-touch .leaflet-bar {
+    border: none;
+
+
+  }
+
+  .map_article .leaflet-touch .leaflet-control-zoom-in,   .map_article .leaflet-touch .leaflet-control-zoom-out {
+    font-size: 14px;
+    color:#007BFF;
+  }
+
+ .map_article .leaflet-touch .leaflet-bar {
+    border: none;
+    background-clip: padding-box;
+  }
+
+  .map_article .leaflet-touch .leaflet-bar a:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+ .map_article .leaflet-touch .leaflet-bar a:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  /** map over card design  **/
+
+  .card_over{
+    background-color:rgba(0, 0, 0, 0.166);
+    position:absolute;
+    z-index: 1000;
+    top:0;
+    bottom:0;
+    left:0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+   
+  }
+  
+  .card_over > section{
+    background-color:white;
+    height: 50%;
+    width: 50%;
+    border-radius: 25px;
+  
+}
+
+.card_over_title{
+
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 18px;
+line-height: 29px;
+color: #394149;
+
+}
+
+.card_over_second_title{
+
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 29px;
+
+color: #000000;
+
+
+}
+
+.heart{
+    background-color:#97979752;
+    border-radius: 4px;
+    padding: 13px;
+    height: 40px;
+    width: 40px;
+    display: flex   ;
+
+}
+p.credit img{
+    width: 80%;
+}
+
+.card_over_service{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 22px;
+    text-align: center;
+    color: #394149;
+    mix-blend-mode: normal;
+    opacity: 0.5;
+}
+
+.card_over_service .text-dark{
+    color:black
+}
+
+.map_right_margin{
+    width:98%;
+    padding-bottom: 30px;
+}
+
+.map_right_margin .leaflet-container {
+    border-radius: 20px;
+    margin-right: 50px;
+}

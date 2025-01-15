@@ -1,0 +1,340 @@
+
+
+.container_home{
+    background-color: #F8F8F8;
+    height: 90vh;
+    padding: 20px;
+    padding-right: 20px;
+    padding-right: 10px;
+    background-position-x: -7%;
+    background-repeat: no-repeat;
+    background-size: 200px;
+    background-position-y: 130%;
+
+}
+.shadow_{
+    box-shadow: 0px 4px 70px 0px #BCBCBC;
+    border-radius: 14px;
+}
+
+
+.header_title{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 34px;
+    color: #000000;
+}
+
+.CustomerActivityBookingMap{
+    width: 297px;
+    border-radius: 6px;
+    position: relative;
+    margin-left: 20px;
+    background-color: white;
+}
+
+.CustomerActivityBookingMap:first-child
+{
+    border:1px solid #007BFF;
+}
+
+.CustomerActivityBookingMap
+{
+    border:1px solid #89C947;
+}
+
+.CustomerActivityBookingMap p{
+    text-align: right;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 560;
+    font-size: 14px;
+    line-height: 22px;
+    color: #000000;
+    margin-top:10px;
+    margin-right: 8px;
+}
+
+
+.CustomerActivityBookingMap .CustomerActivityBookingMap_img{
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    bottom: -38%;
+    max-width: 80px;
+    max-height: 80px;
+}
+
+
+.tab p{
+    margin-right: 50px;
+}
+.tab p img{
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.tab .tab_title{
+    font-family: 'Montserrat';
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 27px;
+    color: #394149;
+}
+
+.menu_active{
+    margin-top:20px; 
+    background-color: white;
+    border-top-right-radius: 10px;
+}
+.menu_active .tab{
+    background-color: #F8F8F8;;
+    width: 600px;
+    border-bottom-right-radius: 20px;
+    border-top-left-radius: 20px;
+}
+.homeMainContent{
+    background-color: white;
+    height: 68vh;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.menu_active_tab{
+    background-color:#E3EFFD;
+    border-top-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+}
+
+.navigation {
+    padding: 10px;
+    border-radius: 100%;
+    height: 40px;
+    width: 40px;
+}
+
+.nativation_container{
+    margin-right: 20px;
+    margin-top:10px
+}
+
+.home_destination_card_container{
+    padding-top: 20px;
+    padding-left: 20px;
+    position: relative;
+    width: 460px;
+    max-width: 460px;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+.home_destination_card{
+    height: 200px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+}
+
+.smallQuarePhoto{
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid white;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+article.absolute_photo{
+    position: absolute;
+    top: 30%;
+    left: 30px;
+
+}
+
+
+.homeMainYellowContainer{
+    background-color:#FFC502;
+    padding: 5px;
+    border-radius:30px;
+    width: 80px;
+    text-align: center;
+    color: #296f6c;
+
+}
+
+.homeMainYellowContainer span{
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.homeMainYellowContainer img{
+    width: 15px;
+}
+
+.homeMainContentTitle{
+    font-size: 14px;
+    text-align: center;
+}
+
+.home_destination_card_title{
+    margin-top:10px;
+    text-align: center;
+}
+.budget_container, .langage_container{
+
+    border-radius: 10px;
+    background: linear-gradient(145deg, #fdf8ec, #e9d9b3);
+    filter: brightness(0.95); /* Légère diminution de la luminosité */
+}
+.meteo_container{
+    border-radius: 10px;
+    width: 100%;
+    padding:25px;
+    margin-top:10px;
+    background-size: cover;
+    background-position: center;
+}
+
+.langage_container{
+    width: 45%;
+}
+.budget_container{
+    width:100%;
+    margin-top:8px
+}
+
+.langage_container p, .budget_container p{
+    margin-bottom: 0;
+    line-height: 16px;
+    padding: 4px;
+    
+}
+
+.first_text{
+    /* Languages */
+font-family: 'Montserrat';
+font-style: normal;
+font-weight: 600;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height */
+
+color: #000000;
+
+mix-blend-mode: normal;
+opacity: 0.5;
+
+}
+.second_text{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1px;
+    /* identical to box height */
+    color:#353131;
+
+}
+
+.iconLangage{
+    margin-right:5px;
+    margin-left:5px
+}
+.expore_more_home{
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 17px;
+    color: #394149;
+    opacity: 0.7;
+    margin-top:5px;
+    margin-bottom:5px
+}
+
+.exporeMoreHomePage .explore-more{
+    width: 79px
+}
+
+.exporeMoreHomePage .explore-more article {
+    width: 100%;
+    height:50px;
+    border: 0.5px solid rgb(205, 205, 205);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.exporeMoreHomePage .explore-more article img{
+    height: 30px;
+    max-height: 30px;
+    width: 30px;
+    max-width: 30px;
+}
+
+.exporeMoreHomePage .expore-more-title{
+    font-size:12px
+}
+
+.see_more{
+    background-color: #007BFF;
+    color: white;
+    padding:20px;
+    height: 60px;
+    width: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.explore_flex_container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.see_more img{
+    width: 10px;
+
+}
+  .iconLangage{
+    width: 2f0px;
+}
+
+
+
+.leaflet-left .leaflet-control {
+
+    margin-left: 10px;
+    transform: rotate(270deg);
+    border:none
+  }
+
+  .leaflet-touch .leaflet-bar {
+    border: none;
+
+
+  }
+
+ .leaflet-touch .leaflet-control-zoom-in,   .leaflet-touch .leaflet-control-zoom-out {
+    font-size: 14px;
+    color:#007BFF;
+  }
+
+
+
+  .leaflet-touch .leaflet-bar a:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+.leaflet-touch .leaflet-bar a:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }

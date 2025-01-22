@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import DestinationBasicInfo from './destinationBasicInfo'
 import Media from "./destinationGalery";
-import ActivityForm from "./activityform";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -40,16 +39,36 @@ function a11yProps(index: number) {
   };
 }
 
-export default function HorizontalTabs() {
+type basicPros = number | null;
+
+
+export default function HorizontalTabs({ index = null }: { index?: basicPros }){
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
+
   return (
-    <Box sx={{ width: "100%",  borderRadius: "2px"}}>
-      {/* Conteneur des onglets */}
+    <Box display="flex">
+    
+      <Box flex={3}>
+          
+      <Typography
+       variant="h2"
+       sx={{fontSize:'25px', fontWeight:'bold', marginBottom:'20px'}}
+      >
+        Add destination & Gallery 
+      </Typography>
+             
+      <Typography
+        sx={{marginBottom:'20px'}}
+      >
+        add destination and its gallery 
+      </Typography>
+    
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -68,48 +87,29 @@ export default function HorizontalTabs() {
               textTransform: "none",
               fontSize: "16px",
               color: "#444",
-            },
-            "& .Mui-selected": {
-              color: "#1976d2",
-            },
+            }
           }}
         >
           <Tab label="Basic Info" {...a11yProps(0)} />
           <Tab label="Gallery" {...a11yProps(1)} />
-          <Tab label="Activity" {...a11yProps(2)} />
-          <Tab label="Things To Do" {...a11yProps(3)} />
-          <Tab label="Culture" {...a11yProps(4)} />
+          <Tab label="Culture" {...a11yProps(2)} />
+          <Tab label="Pratique Info" {...a11yProps(2)} />
+          <Tab label="Histoire" {...a11yProps(2)} />
         </Tabs>
       </Box>
 
       {/* Contenu des panneaux */}
       <TabPanel value={value} index={0}>
         <Typography variant="body1">
-         <DestinationBasicInfo/>
+         <DestinationBasicInfo index={index}/>
         </Typography>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Media/>
+        <Media index={index}/>
       </TabPanel>
-      <TabPanel value={value} index={2}>
-        <ActivityForm/>
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        <Typography variant="h6" gutterBottom>
-          Things To Do
-        </Typography>
-        <Typography variant="body1">
-          Explorez les choses à faire et à découvrir ici.
-        </Typography>
-      </TabPanel>
-      <TabPanel value={value} index={4}>
-        <Typography variant="h6" gutterBottom>
-          Culture
-        </Typography>
-        <Typography variant="body1">
-          Plongez dans la culture de cet endroit.
-        </Typography>
-      </TabPanel>
+      </Box>
+      <Box flex={2}>
+      </Box>
     </Box>
   );
 }

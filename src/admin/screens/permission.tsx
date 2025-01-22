@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -22,6 +22,8 @@ import {
   Snackbar,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
+import HOSTNAME_WEB from '../constants/hostname';
+import { data } from 'react-router-dom';
 
 // Liste des permissions
 const permissionsList = [
@@ -67,7 +69,28 @@ export default function ProfilePermissionsManager() {
     setCurrentTab(newValue);
     setCurrentProfile(null); // Réinitialiser le profil sélectionné lorsque l'on change d'onglet
   };
-
+  
+  // add profil and permission 
+  const handleFetchDataAddprofil = async(profil:Profile)=>
+  {  
+    const response =  await fetch(`${HOSTNAME_WEB}/profil/add`,
+        {
+          method:'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(profil), 
+        }
+    )
+    .then((response)=>{
+      if(!response.ok){
+        throw new Error(`Erreu from server`);
+      }else{
+       
+      }
+    });
+   
+  }
   // Ajouter un profil
   const handleAddProfile = () => {
     if (!newProfileName || selectedPermissions.length === 0) {
@@ -80,8 +103,11 @@ export default function ProfilePermissionsManager() {
       name: newProfileName,
       permissions: selectedPermissions,
     };
-
+   
     setProfiles([...profiles, newProfile]);
+    // make fetch request to save profile to database;
+    handleFetchDataAddprofil(newProfile);
+
     setNewProfileName('');
     setSelectedPermissions([]);
     handleSnackbar('Profil créé avec succès!');
@@ -96,20 +122,47 @@ export default function ProfilePermissionsManager() {
       setSelectedPermissions((prev) => prev.filter((id) => id !== permissionId));
     }
   };
-
-  // Gérer l'édition des permissions pour un profil
+  // update permissition 
   const handleProfilePermissionsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (currentProfile) {
-      const permissionId = Number(event.target.value);
-      const updatedPermissions = event.target.checked
-        ? [...currentProfile.permissions, permissionId]
-        : currentProfile.permissions.filter((id) => id !== permissionId);
-      setCurrentProfile({
-        ...currentProfile,
-        permissions: updatedPermissions,
-      });
+    const permissionId = Number(event.target.value); // Récupère l'ID de la permission
+    let currentProfileP: any = currentProfile?.permissions; // Récupère les permissions actuelles
+  
+    // Si les permissions sont une chaîne, convertir en tableau
+    if (typeof currentProfileP === 'string') {
+      try {
+        currentProfileP = JSON.parse(currentProfileP);
+      } catch (error) {
+        console.error("Erreur lors de l'analyse des permissions :", error);
+        return;
+      }
     }
+  
+    // Assurez-vous que les permissions sont bien un tableau
+    if (!Array.isArray(currentProfileP)) {
+      console.error("Les permissions doivent être un tableau :", currentProfileP);
+      return;
+    }
+  
+    // Ajouter ou retirer la permission
+    if (currentProfileP.includes(permissionId)) {
+      const index = currentProfileP.indexOf(permissionId);
+      currentProfileP.splice(index, 1); // Retirer
+    } else {
+      currentProfileP.push(permissionId); // Ajouter
+    }
+  
+    // Mettre à jour le profil
+    setCurrentProfile({
+      id: currentProfile!.id,
+      name: currentProfile!.name,
+      permissions: currentProfileP,
+    });
+  
+    console.log("Profil mis à jour :", currentProfile);
   };
+  
+  
+  
 
   // Gérer le clic sur un profil dans l'onglet permissions
   const handleProfileClick = (profile: Profile) => {
@@ -120,43 +173,32 @@ export default function ProfilePermissionsManager() {
   const handleSavePermissions = () => {
     if (currentProfile) {
       const updatedProfiles = profiles.map((profile) =>
-        profile.id === currentProfile.id ? currentProfile : profile
+       { 
+        // update the profil on data
+         return  profile.id === currentProfile.id ? currentProfile : profile
+       }
       );
       setProfiles(updatedProfiles);
+      handleUpdatePermissions(currentProfile.id, currentProfile.permissions);
       handleSnackbar('Permissions mises à jour avec succès.');
     }
   };
 
   // Ajouter un membre à l'équipe
-  const handleAddTeamMember = () => {
-    if (!newMemberName || !newMemberEmail || !newMemberPassword || !newMemberAvatar || selectedProfileId === null) {
-      alert('Veuillez entrer un nom, email, mot de passe, avatar et sélectionner un profil.');
-      return;
-    }
 
-    const newMember: TeamMember = {
-      id: teamMembers.length + 1,
-      name: newMemberName,
-      email: newMemberEmail,
-      password: newMemberPassword,
-      avatar: newMemberAvatar,
-      profileId: selectedProfileId,
-    };
-
-    setTeamMembers([...teamMembers, newMember]);
-    setNewMemberName('');
-    setNewMemberEmail('');
-    setNewMemberPassword('');
-    setNewMemberAvatar('');
-    setSelectedProfileId(null);
-    handleSnackbar('Membre ajouté avec succès!');
-  };
 
   // Supprimer un profil
-  const handleDeleteProfile = (profileId: number) => {
+  const handleDeleteProfile = async(profileId: number) => {
+    
+    await fetch(`${HOSTNAME_WEB}/profil/delete/${profileId}`, {
+      method:'DELETE',
+    });
+
     const updatedProfiles = profiles.filter((profile) => profile.id !== profileId);
     setProfiles(updatedProfiles);
     handleSnackbar('Profil supprimé avec succès!');
+    handleShowProfil();
+
   };
 
   // Supprimer un membre d'équipe
@@ -171,6 +213,110 @@ export default function ProfilePermissionsManager() {
     setSnackbarMessage(message);
     setOpenSnackbar(true);
   };
+  
+  const handleShowProfil = async()=>{
+      const response = await fetch(`${HOSTNAME_WEB}/profil`)
+      .then((response)=>{
+          if(!response.ok){
+            throw(" there is an error .... ");
+      }
+      return response.json();
+    }).then((data)=>{
+        
+        var profilFromData = setProfiles(data.message.map((e: Profile) => ({ ...e })));
+        console.log(profilFromData);
+   
+      })
+      .catch((error)=>{
+        console.log(error)
+      })
+  }
+const handleUpdatePermissions= async(profilID:number, permissions:number[])=>{
+
+
+   console.log("permissions is  : .... ");
+
+  console.log(permissions);
+    const response = fetch(`${HOSTNAME_WEB}/profil/update/${profilID}`,
+      {
+        method:'PUT',
+        headers: {
+          'Content-Type': 'application/json', // Ajout de l'en-tête pour spécifier que le corps est en JSON
+        },
+        body: JSON.stringify({ permissions })
+      }
+    ).then((response)=> {
+          if(!response.ok){
+            throw("there is an error");
+          }else{
+            handleShowProfil();
+          }
+          return response.json();
+      }
+     
+    ).catch((error)=>{
+      console.log(error);
+    })
+}
+  useEffect(() => {
+    handleShowProfil();
+    // Initialize profil
+  }, []); 
+
+
+
+  const handleAddTeamMember = async () => {
+    if (!newMemberName || !newMemberEmail || !newMemberPassword || !newMemberAvatar || selectedProfileId === null) {
+      alert('Veuillez entrer un nom, email, mot de passe, avatar et sélectionner un profil.');
+      return;
+    }
+  
+    // Fonction pour envoyer les données à l'API
+    const fetchData = async (data: any) => {
+      try {
+        const response = await fetch(`${HOSTNAME_WEB}/profil/add/user/admin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json', // Important pour JSON
+          },
+          body: JSON.stringify(data),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Erreur API : ${response.statusText}`);
+        }
+  
+        const result = await response.json();
+        console.log('Réponse API :', result);
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout du membre :', error);
+        alert('Une erreur s\'est produite lors de l\'ajout du membre.');
+      }
+    };
+  
+    // Création d'un nouvel objet membre
+    const newMember: TeamMember = {
+      id: teamMembers.length + 1, // ID fictif basé sur la longueur actuelle
+      name: newMemberName,
+      email: newMemberEmail,
+      password: newMemberPassword,
+      avatar: newMemberAvatar,
+      profileId: selectedProfileId,
+    };
+  
+    // Mise à jour de l'état local
+    setTeamMembers([...teamMembers, newMember]);
+    setNewMemberName('');
+    setNewMemberEmail('');
+    setNewMemberPassword('');
+    setNewMemberAvatar('');
+    setSelectedProfileId(null);
+    handleSnackbar('Membre ajouté avec succès!');
+  
+    // Envoi des données à l'API
+    await fetchData(newMember);
+  };
+  
 
   return (
     <Box p={3}>
@@ -372,7 +518,6 @@ export default function ProfilePermissionsManager() {
           </TableContainer>
         </Box>
       )}
-
       {/* Snackbar pour les messages de confirmation */}
       <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
         <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>

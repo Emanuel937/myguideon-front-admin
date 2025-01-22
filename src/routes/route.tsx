@@ -14,17 +14,17 @@ import IndexAdmin                         from '../admin/index'
 
 const routes = [
     {path:'/',                         element : <HomePage/>                           },
-    {path:'/destination/maps/details', element:  <DestinationMapsDetails/>             },
-    {path:'/destination/cultura',      element : <DestinationCulturePage/>             },
-    {path:'/destination/activity',     element : <DestinationActivityPage/>            },
-    {path:'/destination/overview',     element : <DestinationOverviewPage/>            },
-    {path:'/destination/gallery',      element : <DestinationGalleryPage/>             },
-    {path:'/destination/history',      element : <DestinationHistoriquePage/>          },
-    {path:'/destination/usefull-info', element : <DestinationPraticalInformationPage/> },
-    {path:'/destination/review',       element : <DestinationReviewsPage/>             },
+    {path:'/destination/maps/details/:id', element:  <DestinationMapsDetails/>             },
+    {path:'/destination/cultura/:id',      element : <DestinationCulturePage/>             },
+    {path:'/destination/activity/:id',     element : <DestinationActivityPage/>            },
+    {path:'/destination/overview/:id',     element : <DestinationOverviewPage/>            },
+    {path:'/destination/gallery/:id',      element : <DestinationGalleryPage/>             },
+    {path:'/destination/history/:id',      element : <DestinationHistoriquePage/>          },
+    {path:'/destination/usefull-info/:id', element : <DestinationPraticalInformationPage/> },
+    {path:'/destination/review/:id',       element : <DestinationReviewsPage/>             },
    
-    {path:'/admin',                    element:<IndexAdmin/>},
-    {path:'*',                         element : <NotFoundPage/>  },
+    {path:'/admin',                         element:<IndexAdmin/>},
+    {path:'*',                               element : <NotFoundPage/>  },
 
                        
 ];

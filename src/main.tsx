@@ -15,7 +15,7 @@ function App() {
                 element ={router.element}
             />;
           })}
-        </Routes>
+        </Routes> 
       </Router>
   );
 }

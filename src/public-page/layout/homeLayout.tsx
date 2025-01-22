@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HeaderLayout from "./HeaderLayout";
 import "../assets/styles/css/home.css";
 import { ExporeMoreAbout } from "./mixedDestinationLayout";
 import { Link } from "react-router-dom";
+import HOSTNAME_WEB from "../../admin/constants/hostname";
+import { hostname } from "os";
 
 // Définition des types pour les composants
 interface ContainerDestinationProps {
-  cover: string;
+  componentData:any;
 }
 
 interface NavigationItensProps {
@@ -18,7 +20,36 @@ interface CustomerActivityBookingMapProps {
   name: string;
 }
 
+  
 const HomeLayout = () => {
+
+  const [data, setData] =  useState([]);
+
+  const handleFetchData = async()=>{
+    const response = fetch(`${HOSTNAME_WEB}/destination`)
+         .then((response)=>{
+            if(!response.ok){
+              throw('there is an error');
+            }
+            return response.json();
+         })
+         .then((data)=>{
+            setData(data);
+            console.log(data);
+         }).catch((error)=>{
+          console.log(error);
+         })
+
+ 
+
+  }
+  useEffect(()=>{
+    handleFetchData();
+    console.log();
+
+  }, []);
+
+
   return (
     <div className="homeBody">
       <HeaderLayout />
@@ -66,9 +97,12 @@ const HomeLayout = () => {
             </section>
           </article>
           <article className="homeMainContent d-flex">
-            <ContainerDestination cover={"ile_1.png"} />
-            <ContainerDestination cover={"ile_2.png"} />
-            <ContainerDestination cover={"ile_3.png"} />
+            {
+              data.map((e)=>{
+                return  <ContainerDestination componentData={e} />
+              })
+            }
+        
           </article>
         </section>
       </section>
@@ -78,32 +112,34 @@ const HomeLayout = () => {
 
 // Composant ContainerDestination
 const ContainerDestination: React.FC<ContainerDestinationProps> = ({
-  cover,
+  componentData,
 }) => {
+   const basicInfo = JSON.parse(componentData.basic_info);
+   const gallery  =  JSON.parse(componentData.gallery);
+
+  
+
   return (
     <div>
       <section className="home_destination_card_container">
         <article
           className="home_destination_card"
-          style={{ backgroundImage: `url('/assets/img/destination/${cover}')` }}
+          style={{ backgroundImage: `url('${HOSTNAME_WEB}${componentData.imageCover}')` }}
         ></article>
+        { gallery.map((image: any)=>
         <article className="absolute_photo">
+
           <img
             className="smallQuarePhoto"
-            src={"/assets/img/destination/gal_3.png"}
+            src={`${HOSTNAME_WEB}${image}`}
           />
-          <img
-            className="smallQuarePhoto"
-            src={"/assets/img/destination/gal_3.png"}
-          />
-          <img
-            className="smallQuarePhoto"
-            src={"/assets/img/destination/gal_3.png"}
-          />
+          
         </article>
+        )
+        }
         <section className="d-flex home_destination_card_title justify-content-between">
           <h2 className="homeMainContentTitle">
-            Maldives - The Tropical Paradise
+           {basicInfo.destinationName}
           </h2>
           <p className="homeMainYellowContainer">
             <img src={"/assets/img/person.svg"} />
@@ -120,7 +156,7 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
               <div>
                 <p>
                   <span className="first_text">Languages</span> <br />
-                  <span className="second_text">English, French</span>
+                  <span className="second_text">{basicInfo.language}</span>
                 </p>
               </div>
             </article>
@@ -134,7 +170,7 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
               <div>
                 <p>
                   <span className="first_text">Currencies</span> <br />
-                  <span className="second_text">USD, GBP, EURO</span>
+                  <span className="second_text">{basicInfo.currency}</span>
                 </p>
               </div>
             </article>
@@ -151,7 +187,7 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
                 <span className="first_text">Budget Required for a Trip</span>{" "}
                 <br />
                 <span className="second_text">
-                  $1200-$1500 for a every week spent
+                  {basicInfo.budget}{basicInfo.currency} for a every week spent
                 </span>
               </p>
             </div>
@@ -172,7 +208,8 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
             <ExporeMoreAbout img="/assets/img/pratical-info.png" text="Pratical info" />
           </section>
           <section className="see_more">
-            <Link to="/destination/overview" aria-label="View Destination Overview">
+          <Link to={`/destination/overview/${componentData.id}`}
+               aria-label="View Destination Overview">
               <img
                 src="/assets/img/right-white.svg"
                 alt="Arrow pointing to the right"

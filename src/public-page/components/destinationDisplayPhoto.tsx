@@ -11,12 +11,11 @@ interface SmallDestinationPhotoProps {
 }
 
 const SmallDestinationPhoto: React.FC<SmallDestinationPhotoProps> = ({ img, onClick }) => {
-    const avatarPath = `../assets/img/destination/user/1/${img}`;
     return (
         <div className="smallPhoto">
             <img
                 alt="destination photo"
-                src={avatarPath}
+                src={img}
                 onClick={onClick}
             />
         </div>
@@ -28,11 +27,10 @@ interface LargestDestinationPhotoProps {
 }
 
 const LargestDestinationPhoto: React.FC<LargestDestinationPhotoProps> = ({ imageName }) => {
-    const path = `../assets/img/destination/user/1/${imageName}`;
     return (
         <div className="bigPhoto">
             <img
-                src={path}
+                src={imageName}
                 alt="the biggest destination photo"
             />
         </div>

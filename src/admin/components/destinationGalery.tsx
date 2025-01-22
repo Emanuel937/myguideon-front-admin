@@ -16,6 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ImageUploader from "./uploadImage"; // Le composant d'upload que vous avez fourni
+import HOSTNAME_WEB from "../constants/hostname";
 
 interface MediaItem {
   id: string;
@@ -26,13 +27,21 @@ interface MediaItem {
   file: File; // Fichier réel pour l'envoi au serveur
 }
 
-const Media = () => {
-  const [mediaList, setMediaList] = useState<MediaItem[]>([]);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [coverId, setCoverId] = useState<string | null>(null); // ID de l'image "cover"
+
+type basicPros = number | null ;
+
+const Media =  ({ index = null }: { index?: basicPros })  => {
+  const [mediaList, setMediaList]          = useState<MediaItem[]>([]);
+  const [viewMode, setViewMode]            = useState<"grid" | "list">("grid");
+  const [coverId, setCoverId]              = useState<string | null>(null); // ID de l'image "cover"
+  var destinationId: number | null         = null;
+  destinationId                            =  Number(localStorage.getItem('destinationId'));
+  const [coverName, setCoverName]          = useState(" ");
 
   // Charger les fichiers stockés dans la session au démarrage
   useEffect(() => {
+    // get the destinationId
+
     const savedMedia = sessionStorage.getItem("mediaList");
     if (savedMedia) {
       setMediaList(JSON.parse(savedMedia));
@@ -42,6 +51,7 @@ const Media = () => {
   // Sauvegarder dans la session chaque fois que `mediaList` change
   useEffect(() => {
     sessionStorage.setItem("mediaList", JSON.stringify(mediaList));
+    
   }, [mediaList]);
 
   const handleUpload = (file: File | null) => {
@@ -65,32 +75,44 @@ const Media = () => {
       setCoverId(null); // Supprimer la couverture si elle est supprimée
     }
   };
-
   const handleSetCover = (id: string) => {
-    setCoverId(id);
+    setCoverId(id); // Mettre à jour uniquement l'ID de couverture
     setMediaList((prev) =>
-      prev.map((item) => ({ ...item, isCover: item.id === id }))
+      prev.map((item) => {
+      if(item.id == id){
+        setCoverName(item.name);
+      }
+      return ({
+        ...item,
+        isCover: item.id === id,
+      })
+    }
+    )
     );
   };
-
   const handleSubmit = async () => {
     try {
-      // Préparer les données à envoyer
       const formData = new FormData();
       mediaList.forEach((item) => {
-        formData.append("files", item.file);
-        formData.append("names", item.name);
+        formData.append("files", item.file); // Ajouter le fichier
+        formData.append("names", item.name); // Ajouter le nom
       });
       if (coverId) {
-        formData.append("cover", coverId); // Inclure l'ID de l'image définie comme couverture
+        formData.append("cover", coverName); // Inclure le nom du fichier défini comme couverture
       }
-
-      // Envoyer les données au serveur
-      const response = await fetch("https://your-server.com/upload", {
+      
+      if(index == null){
+        destinationId = destinationId;
+        
+      }else{
+        destinationId = index;
+      }
+      
+      const response = await fetch(`${HOSTNAME_WEB}/destination/update/gallery/${destinationId}`, {
         method: "POST",
         body: formData,
       });
-
+  
       if (response.ok) {
         alert("Fichiers envoyés avec succès !");
         setMediaList([]);
@@ -101,27 +123,14 @@ const Media = () => {
       }
     } catch (error) {
       console.error("Erreur :", error);
-      alert("Une erreur s'est produite lors de l'envoi.");
+
     }
   };
+  
 
   return (
     <Box sx={{ p: 2, bgcolor: "#f9f9f9", borderRadius: 2, position: "relative" }}>
-      {/* Bouton Submit en haut */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        sx={{
-          position: "fixed",
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-        }}
-        disabled={mediaList.length === 0} // Désactiver si aucun média
-      >
-        Submit
-      </Button>
+  
 
       {/* Header */}
       <Box
@@ -146,9 +155,22 @@ const Media = () => {
             startIcon={<ViewListIcon />}
             onClick={() => setViewMode("list")}
             variant={viewMode === "list" ? "contained" : "outlined"}
+            sx={{ mr: 1 }}
           >
             List
           </Button>
+              {/* Bouton Submit en haut */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+        sx={{
+          zIndex: 1000,
+        }}
+        disabled={mediaList.length === 0} // Désactiver si aucun média
+      >
+        Submit
+      </Button>
         </Box>
       </Box>
 
@@ -161,7 +183,7 @@ const Media = () => {
       {viewMode === "grid" ? (
         <Grid container spacing={2}>
           {mediaList.map((item) => (
-            <Grid item xs={6} sm={4} md={3} key={item.id}>
+            <Grid item xs={6} sm={4} md={5} key={item.id}>
               <Box
                 sx={{
                   position: "relative",
@@ -178,7 +200,7 @@ const Media = () => {
                     alt={item.name}
                     style={{
                       width: "100%",
-                      height: "auto",
+                      height: "200px",
                       display: "block",
                     }}
                   />

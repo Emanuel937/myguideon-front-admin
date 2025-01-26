@@ -5,15 +5,12 @@ import Snackbar from '@mui/material/Snackbar'; // Pour afficher une alerte tempo
 import SearchSuggestion from '../components/search_suggestion';
 import languagesData from "../constants/lang.json";
 import {
-  Box,
-  TextField,
-  MenuItem,
-  Button,
-  Grid,
-  Typography,
+  Box, TextField, MenuItem,
+  Button, Grid
 } from "@mui/material";
 import HOSTNAME_WEB from '../constants/hostname';
 import axios from "axios";
+import AutoCompleteSuggestion from "./auto_complete_susgestion";
 
 interface UploadedImage {
   file: File | null;
@@ -29,19 +26,22 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
 
   const [formData, setFormData] = useState({
     destinationName: "",
-    language: "English",
+    language: ["English"],
     budget: "",
     currency: "USD",
     status: "Draft",
     address: "",
-    categories:" "
+    categories: " ",
+    lon:'',
+    lat:' '
   });
 
-  const [successAlert, setSuccessAlert]    = useState(false); // État pour l'alerte de succès
-  const [weatherImages, setWeatherImages]  = useState<UploadedImage[]>([]);
-  const [suggestions, setSuggestions]      = useState<any[]>([]);
-  const [languages, setLanguages]          = useState<string[]>([]);
-  const [categories, setCategories]        = useState<string[]>([]);
+  const [successAlert, setSuccessAlert]   = useState(false); // État pour l'alerte de succès
+  const [weatherImages, setWeatherImages] = useState<UploadedImage[]>([]);
+  const [suggestions, setSuggestions]     = useState<any[]>([]);
+  const [languages, setLanguages]         = useState<string[]>([]);
+  const [categories, setCategories]       = useState<string[]>([]);
+  const [langueTags, setLangueTags]       = useState<string[]>([]);
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
@@ -51,15 +51,18 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
       axios.get("https://nominatim.openstreetmap.org/search", {
         params: { q: input, format: "json", addressdetails: 1, limit: 5 },
       })
-      .then((response) => setSuggestions(response.data))
-      .catch(() => setSuggestions([]));
+        .then((response) =>{ 
+          console.log(response);
+          return setSuggestions(response.data)}
+      )
+        .catch(() => setSuggestions([]));
     } else {
       setSuggestions([]);
     }
   };
 
   const handlePlaceSelect = (place: any) => {
-    setFormData({ ...formData, address: place.display_name });
+    setFormData({ ...formData, address: place.display_name, lon:place.lon, lat:place.lat });
     setSuggestions([]);
   };
 
@@ -76,77 +79,102 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+ 
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const data = new FormData();
+  
+    // Ajouter les données de formulaire (destinationName, budget, etc.)
     Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
+      // Si la valeur est un tableau, on l'ajoute séparément dans FormData
+      if (Array.isArray(value)) {
+        value.forEach((val) => {
+          data.append(key, val); // Ajouter chaque élément du tableau comme une nouvelle entrée
+        });
+      } else {
+        data.append(key, value.toString());
+      }
     });
+  
+    // Supprimer les doublons dans les tags de langue
+    const uniqueLangueTags = Array.from(
+      new Set(
+        langueTags.map((tag) =>
+          tag.trim().toLowerCase() // Normaliser les valeurs (supprimer les espaces, mettre en minuscule)
+        )
+      )
+    );
 
+  
+    // Ajouter les images météo
     weatherImages.forEach((img, index) => {
       if (img.file) {
         data.append(`weatherImage_${index}`, img.file);
       }
     });
-
+  
     try {
       const response = await fetch(restApiLink, {
         method: "POST",
         body: data,
-      }).then(
-        (res) => {
-          setSuccessAlert(true)
-          return res.json()
-        }
-      );
-      
+      }).then((res) => {
+        setSuccessAlert(true);
+        return res.json();
+      });
+  
       if (response.id) {
-        localStorage.setItem('destinationId', response.id);
+        localStorage.setItem("destinationId", response.id);
       } else {
-        console.error('Erreur lors de l’ajout :', response);
+        console.error("Erreur lors de l’ajout :", response);
       }
     } catch (error) {
       console.error("Erreur de réseau : ", error);
     }
   };
-
+  
+  
+  
   const getCurrentDestination = async () => {
     try {
       const response = await fetch(`${HOSTNAME_WEB}/destination/${index}`);
       if (!response.ok) throw new Error('Erreur lors de la récupération');
-      const data = (await response.json()).data.basic_info;
-      setFormData({ ...JSON.parse(data) });
+
+       var data = (await response.json()).data.basic_info; 
+       data = JSON.parse(data);
+       var lang:any;
+
+      
+    
+      lang = [...new Set(data.language)];
+      setFormData({ ...data});
+      setLangueTags(lang);
+
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchCategories = async()=>{
-    const response =  await fetch(`${HOSTNAME_WEB}/categories`)
-    .then((response)=>{
-      if(!response.ok){
-        throw('there is an error');
-      }
-      return response.json();
+  const fetchCategories = async () => {
+    const response = await fetch(`${HOSTNAME_WEB}/categories`)
+      .then((response) => {
+        if (!response.ok) {
+          throw ('there is an error');
+        }
+        return response.json();
+      }).then((response) => {
 
-    }).then((response)=>{
+        var categoriesArray = response.map((e: any) => {
+          return e.categories_name;
+        });
 
-      var categoriesArray = response.map((e:any)=>
-      {
-        return e.categories_name;
+        setCategories([...categoriesArray]);
 
-      });
-
-      setCategories([...categoriesArray]);
-
-    
-
-    }).catch((error)=>{
-      console.log(error);
-    })
-  
+      }).catch((error) => {
+        console.log(error);
+      })
   }
 
   useEffect(() => {
@@ -154,19 +182,28 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
       .then((response) => response.json())
       .then((data) => setLanguages(data.languages))
       .catch(() => console.error("Erreur lors du chargement des langues"));
-  
+
     if (index != null) {
       getCurrentDestination();
     }
-  
+
     fetchCategories();
   }, [index]); // Ajoutez les dépendances nécessaires
-  
+
 
   useEffect(() => {
-    console.log("Mise à jour des catégories : silence");
   }, [categories]);
-  
+
+
+  const handleAutoCompleteChange = (newTags: string[]) => {
+
+      setLangueTags(newTags); // Met à jour l'état avec les nouveaux tags uniquement si c'est unique
+  };
+
+  // Utilisation de useEffect pour observer les changements de `tags`
+  useEffect(() => {
+      setFormData({...formData, language:langueTags});
+  }, [langueTags]);
 
   return (
     <Box>
@@ -185,14 +222,15 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
             />
           </Grid>
 
-          {/* Langue */}
           <Grid item xs={6}>
-            <SearchSuggestion
-              placeholder="Langue"
-              queryData={languagesData.languages}
+            {/* Langue */}
+            {/* Testing the auto complete suggestion for langue */}
+            <AutoCompleteSuggestion
+              placeholder="Language"
+              value= {langueTags} // Valeur des tags sélectionnés
               name="language"
-              value={formData.language}
-              handleChange={handleChange}
+              queryData={languagesData.languages}
+              handleChange={handleAutoCompleteChange} // Gestionnaire de changement
             />
           </Grid>
 
@@ -293,15 +331,18 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
               </ul>
             )}
           </Grid>
+
           <Grid item xs={6}>
             <SearchSuggestion
-                placeholder="Type the categories"
-                queryData={categories}
-                name="categories"
-                value={formData.categories}
-                handleChange={handleChange}
-              />
+              placeholder="Type the categories"
+              queryData={categories}
+              name="categories"
+              handleChange={handleChange}
+              value={formData.categories}
+              callback={handleChange}
+            />
           </Grid>
+
           {/* Images météo */}
           <Grid item xs={12}>
             <ImageUploader

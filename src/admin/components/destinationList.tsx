@@ -103,7 +103,7 @@ const DestinationList: React.FC = () => {
           return {
             id: item.id,
             name: parsedBasicInfo.destinationName,
-            language: parsedBasicInfo.language,
+            language: parsedBasicInfo.language.join(" , "),
             budget: parsedBasicInfo.budget,
             currency: parsedBasicInfo.currency,
             country: parsedBasicInfo.address || "N/A",
@@ -138,6 +138,7 @@ const DestinationList: React.FC = () => {
   }
 
   useEffect(() => {
+    
     fetchDestinations();
   }, []);
 
@@ -181,8 +182,9 @@ const DestinationList: React.FC = () => {
                     onChange={handleLanguageFilterChange}
                     displayEmpty
                     variant="outlined"
+                    fullWidth
                     sx={{
-                      maxWidth: "200px",
+                      maxWidth: "400px",
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "8px",
                         backgroundColor: "#ffffff",
@@ -214,8 +216,9 @@ const DestinationList: React.FC = () => {
                     onChange={handleStatusFilterChange}
                     displayEmpty
                     variant="outlined"
+                    fullWidth
                     sx={{
-                      maxWidth: "200px",
+                      maxWidth: "400px",
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "8px",
                         backgroundColor: "#ffffff",
@@ -247,8 +250,9 @@ const DestinationList: React.FC = () => {
                     onChange={handleCurrencyFilterChange}
                     displayEmpty
                     variant="outlined"
+                    fullWidth
                     sx={{
-                      maxWidth: "200px",
+                      maxWidth: "400px",
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "8px",
                         backgroundColor: "#ffffff",

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, IconButton, Box, Grid, Typography, Divider, Alert } from '@mui/material';
+import { TextField, Button,MenuItem, IconButton, Box, Grid, Typography, Divider, Alert } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import HOSTNAME_WEB from '../constants/hostname';
 import axios from "axios";
-
+import SearchSuggestion from './search_suggestion';
+import { json } from 'node:stream/consumers';
 
 // Définir le type des props
 interface AddThingsToDoFormProps {
@@ -23,12 +24,15 @@ type Activity = {
   icon: File | string | null; // Icône de l'activité (peut être un fichier ou une URL)
   destination_name: string; // Nom de la destination
   gallery: File[] | string[] | null; // Galerie peut contenir plusieurs fichiers ou URLs d'images
+  categories:string,
+  status:string,
+  lon:string
+  lat:string
 };
 
 
 const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
 
-  
   const [activities, setActivities] = useState<Activity[]>([]);
   const [currentActivity, setCurrentActivity] = useState<Activity>({
     id:null,
@@ -38,67 +42,29 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
     icon: null,
     destination_name: '', // Ensuring the destination field is kept
     gallery: null,
+    categories:'',
+    status:'',
+    lon:'',
+    lat:'',
   });
   
-  useEffect(() => {
-    if (index !== null) {
-      const fetchActivityData = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`${HOSTNAME_WEB}/activities/${index}`);
-          const activity = response.data[0];
-          console.log(response);
-
-          setCurrentActivity({
-            id: activity.id,
-            name: activity.name || '',
-            description: activity.description || '',
-            address: activity.adress || '',
-            icon: `${HOSTNAME_WEB}/public/uploads/destination/activities/${activity.icon}`, // L'icône ne peut pas être directement chargée dans File, à gérer si nécessaire
-            destination_name: activity.destination_name || '',
-            gallery: null, // Idem pour la galerie
-          });
-        } catch (error) {
-          console.error("Erreur lors de la récupération de l'activité", error);
-        } finally {
-          setLoading(false);
-        }
-       
-      };
-
-      fetchActivityData();
-    }
-  }, [index]);
+ 
 
   // Suggestions de lieux
-  const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions]                  = useState<any[]>([]);
+  const [editingIndex, setEditingIndex]                = useState<number | null>(null);
+  const [loading, setLoading]                          = useState(false);
+  const [queryDestination, setQueryDestination]        = useState<string[]>(['']);
 
-  const handleAddActivity = () => {
-    if (currentActivity.name && currentActivity.description && currentActivity.address && currentActivity.icon && currentActivity.destination_name) {
-      if (editingIndex !== null) {
-        // Update an existing activity
-        const updatedActivities = [...activities];
-        updatedActivities[editingIndex] = currentActivity;
-        setActivities(updatedActivities);
-        setEditingIndex(null);
-      } else {
-        // Add a new activity
-        setActivities([...activities, currentActivity]);
-      }
-
-      setCurrentActivity({
-        id:null,
-        name: '',
-        description: '',
-        address: '',
-        icon: null,
-        destination_name: '',
-        gallery: null,
-      }); // Reset the form
-    }
-  };
+  const  queryCategories:string[] = [
+    "NATURE & ADVENTURE", "EXPLORATION", "VISIT WORSHIP PLACES", "BEACHES & SUNBATHING","SPORTS"
+  ];
+  const queryStatus:string[] = [
+    "Dublished",
+    "Draft",
+    "Disabled",
+    "Pending validation"
+  ]
 
   // Recherche de lieux dans Nominatim d'OpenStreetMap
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,10 +98,15 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
 
   // Fonction pour sélectionner un lieu et remplir le champ "Location"
   const handlePlaceSelect = (place: any) => {
+   
     setCurrentActivity({
       ...currentActivity,
-      address: place.display_name, // Utiliser le nom complet du lieu sélectionné
+      address: place.display_name,
+      lon: place.lon,
+      lat:place.lat
+       // Utiliser le nom complet du lieu sélectionné
     });
+  
     setSuggestions([]); // Réinitialiser les suggestions après sélection
   };
 
@@ -178,7 +149,13 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
         formData.append(`activities[${index}][name]`, activity.name);
         formData.append(`activities[${index}][description]`, activity.description);
         formData.append(`activities[${index}][address]`, activity.address);
-        formData.append(`activities[${index}][destination_name]`, activity.destination_name); // Destination name
+        formData.append(`activities[${index}][destination_name]`, activity.destination_name);
+        formData.append(`activities[${index}][status]`, activity.status);
+        formData.append(`activities[${index}][categories]`, activity.categories);
+        formData.append(`activities[${index}][lon]`,                          activity.lon); 
+        formData.append(`activities[${index}][lat]`,                          activity.lat); 
+ 
+        // Destination name
         if (activity.icon) {
           formData.append('icon', activity.icon);  // Correspond au champ icon dans Multer
         }
@@ -195,18 +172,17 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
       });
 
       if (response.ok) {
-        alert('Données enregistrées avec succès !');
         setActivities([]);
       } else {
         alert('Une erreur est survenue lors de l’enregistrement.');
       }
     } catch (error) {
       console.error(error);
-      alert('Erreur de communication avec le serveur.');
     } finally {
       setLoading(false);
     }
   };
+
 
 
   const handleUpdateActivities = async(index:string)=>{
@@ -217,11 +193,17 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
     try {
       const formData = new FormData();
       activities.forEach((activity, index) => {
-        formData.append(`activities[${index}][name]`, activity.name);
-        formData.append(`activities[${index}][description]`, activity.description);
-        formData.append(`activities[${index}][address]`, activity.address);
-        formData.append(`activities[${index}][destination_name]`, activity.destination_name); // Destination name
-        if (activity.icon) {
+
+        formData.append(`activities[${index}][name]`,                           activity.name);
+        formData.append(`activities[${index}][description]`,             activity.description);
+        formData.append(`activities[${index}][address]`,                     activity.address);
+        formData.append(`activities[${index}][destination_name]`,   activity.destination_name);
+        formData.append(`activities[${index}][categories]`,               activity.categories); 
+        formData.append(`activities[${index}][status]`,                       activity.status); 
+        formData.append(`activities[${index}][lon]`,                          activity.lon); 
+        formData.append(`activities[${index}][lat]`,                          activity.lat); 
+    
+        if (activity.icon){
           formData.append('icon', activity.icon);  // Correspond au champ icon dans Multer
         }
         if (activity.gallery) {
@@ -244,7 +226,6 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
       }
     } catch (error) {
       console.error(error);
-      alert('Erreur de communication avec le serveur.');
     } finally {
       setLoading(false);
     }
@@ -256,6 +237,131 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
       // Appel de la fonction async dans un contexte synchrone
       handleUpdateActivities(id.toString());
     };
+
+
+  // fetch destination name
+  const fetchDestinationName = async()=>{
+
+    const response =  await fetch(`${HOSTNAME_WEB}/destination`)
+
+    .then((response)=>{
+      if(!response.ok){
+        throw("there is an error")
+      }
+      return response.json();
+
+    }).then((response)=>{
+         var  destinationArray =  response.map((e:any)=>{
+           var jsonData  = JSON.parse(e.basic_info);
+
+           return jsonData.destinationName;
+         });
+
+        setQueryDestination([destinationArray][0]);
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  }
+
+
+  const handleAddActivity = () => {
+    if (currentActivity.name && currentActivity.description && currentActivity.address && currentActivity.icon && currentActivity.destination_name) {
+      if (editingIndex !== null) {
+        // Update an existing activity
+        const updatedActivities = [...activities];
+        updatedActivities[editingIndex] = currentActivity;
+        setActivities(updatedActivities);
+        setEditingIndex(null);
+      } else {
+        // Add a new activity
+        setActivities([...activities, currentActivity]);
+      }
+
+      setCurrentActivity({
+        id:null,
+        name: '',
+        description: '',
+        address: '',
+        icon: null,
+        destination_name: '',
+        gallery: null,
+        categories:'',
+        status:'Draft',
+        lon:'',
+        lat:''
+      }); 
+    }
+  };
+ 
+  const handleCallback = (e: React.ChangeEvent<HTMLInputElement>)=>
+  {
+      const { name, value } = e.target;
+      setCurrentActivity({ ...currentActivity, destination_name: value });
+  }
+
+  const handleCallbackCategories = (e: React.ChangeEvent<HTMLInputElement>)=>
+    {
+        const { name, value } = e.target;
+        setCurrentActivity({ ...currentActivity, categories: value });
+    }
+  // set categories 
+
+  const handleCategoriesSuggestion = (e: React.ChangeEvent<HTMLInputElement>)=>{
+
+      setCurrentActivity({ ...currentActivity, categories: e.target.value });
+  }
+  //set detination name
+
+  const handleDestinationSuggestion =(e: React.ChangeEvent<HTMLInputElement>)=>{
+    setCurrentActivity({ ...currentActivity, destination_name: e.target.value });
+  }
+
+  useEffect(()=>{
+    fetchDestinationName();
+   
+  }, []);
+
+  useEffect(() => {
+    
+    if (index !== null) {
+
+      const fetchActivityData = async () => {
+
+        setLoading(true);
+
+        try {
+            
+            const response = await axios.get(`${HOSTNAME_WEB}/activities/${index}`);
+            const activity = response.data[0];
+           console.log(activity);
+            setCurrentActivity({
+              id                :  activity.id,
+              name              :  activity.name || '',
+              description       :  activity.description || '',
+              address           :  activity.adress || '',
+              icon              : `${HOSTNAME_WEB}/public/uploads/destination/activities/${activity.icon}`,
+              destination_name  :  activity.destination_name || '',
+              gallery           :  null,
+              categories        :  activity.category,
+              status            :  activity.status,
+              lon               :  activity.lon,
+              lat               : activity.lat
+            });
+
+        } catch (error) 
+        {
+          console.error("Erreur lors de la récupération de l'activité", error);
+
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchActivityData();
+    }
+  
+  
+  }, [index]);
 
   return (
     <Box display={'flex'}>
@@ -282,15 +388,41 @@ const ActivityForm: React.FC<AddThingsToDoFormProps> = ({index}) => {
             />
           </Grid>
           <Grid item xs={6} >
-            <input className='form-control'
-              placeholder="Destination"
-              list="options" id="search" name="search"
-              value={currentActivity.destination_name}
-              onChange={(e) => handleChange('destination_name', e.target.value)} // Handle destination_name
+             <SearchSuggestion
+              placeholder='Destination'
+              value = {currentActivity.destination_name}
+              name='destination'
+              handleChange={handleDestinationSuggestion}
+              queryData={queryDestination}
+              callback={()=> handleCallback}
             />
-            <datalist id="options">
-              <option value="Pomme" />
-            </datalist>
+          </Grid>
+          <Grid item xs={6} >
+             <SearchSuggestion
+              placeholder='categories'
+              value = {currentActivity.categories}
+              name='categories'
+              handleChange={handleCategoriesSuggestion}
+              queryData={queryCategories}
+              callback={()=> handleCallbackCategories}
+            />
+          </Grid>
+          <Grid item xs={6} >
+              <TextField
+                  label="Statut"
+                  fullWidth
+                  name="status"
+                  value={currentActivity.status}
+                  onChange={(e) => handleChange('status', e.target.value)}
+                  select
+                  required
+                >
+                  {["Published", "Disabled", "Draft", "Pending validation"].map((e) => (
+                    <MenuItem key={e} value={e}>
+                      {e}
+                    </MenuItem>
+                  ))}
+                </TextField>
           </Grid>
 
           {/* Adresse de l'activité */}

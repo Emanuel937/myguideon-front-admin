@@ -114,7 +114,6 @@ const Media =  ({ index = null }: { index?: basicPros })  => {
       });
   
       if (response.ok) {
-        alert("Fichiers envoyés avec succès !");
         setMediaList([]);
         sessionStorage.removeItem("mediaList");
         setCoverId(null);

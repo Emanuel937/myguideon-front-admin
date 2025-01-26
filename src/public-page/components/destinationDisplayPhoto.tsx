@@ -5,18 +5,21 @@
 
 import React from 'react';
 
-interface SmallDestinationPhotoProps {
-    img: string;
-    onClick: () => void;
-}
 
-const SmallDestinationPhoto: React.FC<SmallDestinationPhotoProps> = ({ img, onClick }) => {
+
+interface SmallDestinationPhotoProps {
+    onClick: (src: string) => void; // Fonction pour gérer le clic avec le src de l'image
+    img: string; // Source de l'image à afficher
+  }
+
+const SmallDestinationPhoto = ({ img, onClick, }: SmallDestinationPhotoProps) => {
+
     return (
         <div className="smallPhoto">
             <img
                 alt="destination photo"
                 src={img}
-                onClick={onClick}
+                onClick={(e) => onClick((e.target as HTMLImageElement).src)} 
             />
         </div>
     );

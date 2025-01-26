@@ -16,6 +16,14 @@ module.exports = {
         use: 'ts-loader',  // Utilisation de ts-loader pour compiler le TypeScript
         exclude: /node_modules/,  // Ne pas traiter les fichiers dans node_modules
       },
+      {
+        test: /\.css$/,  // Capture tous les fichiers CSS
+        use: [
+          'style-loader',  // Injecte les styles dans le DOM
+          'css-loader',    // Résout les imports CSS
+          'postcss-loader', // Traite les fichiers avec PostCSS (ex. autoprefixer, tailwindcss)
+        ],
+      },
     ],
   },
   devtool: 'source-map',  // Pour des cartes de source (source maps) utiles pour le débogage

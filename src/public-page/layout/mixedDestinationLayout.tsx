@@ -1,31 +1,34 @@
-import React from 'react';
+import React, {useEffect, useState}  from 'react';
 import MapComponent from '../components/map_component';
 
 
 interface DestinationInfo {icon:string, title:string, description:string}
 interface ExporeMoreAboutInterface {img:string, text:string }
 
-const MixDestinationLayout = ()=>{
+const MixDestinationLayout = (data: any) => {
+  
+  var data= data.data;
+
     return (
         <div id="Mix">
             <div className='d-flex '>
               <div>
-                <h2 className="mt-5">Maldives - The Tropical Paradise</h2>
+                <h2 className="mt-5">{data?.destinationName}</h2>
                 <div className="d-flex">
                     <DestinationInfo
                         icon="dolar.svg"
                         title="Currencies"
-                        description="USD, GBP, EURO"
+                        description={data?.currency}
                     />
                      <DestinationInfo
                         icon="global.svg"
                         title="Languages"
-                        description="English, French"
+                        description={data.language?.join(" , ")}
                     />
                      <DestinationInfo
                         icon="dollarpack.svg"
                         title="Budget Required for a Trip"
-                        description="$1200-$1500 for a every week spent"
+                        description={`${data?.budget} ${data?.currency} for a every week spent`}
                     />
                    
                 </div>
@@ -43,7 +46,7 @@ const MixDestinationLayout = ()=>{
             <section>
               <h3>DESTINATION DETAILS & RATINGS</h3>
               <h4>Explore More about Maldives</h4>
-               <section className='d-flex justify-content-between'>
+               <section className='d-flex'>
                   <ExporeMoreAbout
                     img="/assets/img/culture.png"
                     text="Cultures"

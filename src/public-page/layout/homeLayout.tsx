@@ -35,18 +35,14 @@ const HomeLayout = () => {
          })
          .then((data)=>{
             setData(data);
-            console.log(data);
          }).catch((error)=>{
           console.log(error);
          })
 
- 
-
   }
+
   useEffect(()=>{
     handleFetchData();
-    console.log();
-
   }, []);
 
 
@@ -114,29 +110,38 @@ const HomeLayout = () => {
 const ContainerDestination: React.FC<ContainerDestinationProps> = ({
   componentData,
 }) => {
-   const basicInfo = JSON.parse(componentData.basic_info);
-   const gallery  =  JSON.parse(componentData.gallery);
-
+   
+   const [cover, setCover]  = useState({cover:`${HOSTNAME_WEB}${componentData.imageCover}`});
+   const basicInfo          = JSON.parse(componentData.basic_info);
+   var gallery              = JSON.parse(componentData.gallery);
+   gallery                  = gallery.slice(0, 7);
   
+
+   const handleChangePhoto = (e:any)=>{
+       setCover({cover:e.target.src});
+   }
 
   return (
     <div>
       <section className="home_destination_card_container">
         <article
           className="home_destination_card"
-          style={{ backgroundImage: `url('${HOSTNAME_WEB}${componentData.imageCover}')` }}
+          style={{ backgroundImage: `url('${cover.cover}')` }}
         ></article>
-        { gallery.map((image: any)=>
         <article className="absolute_photo">
+        { gallery.map((image: any)=>
+            ( 
 
-          <img
-            className="smallQuarePhoto"
-            src={`${HOSTNAME_WEB}${image}`}
-          />
-          
-        </article>
+                <img
+                  className="smallQuarePhoto"
+                  src={`${HOSTNAME_WEB}${image}`}
+                  onClick={(e)=>handleChangePhoto(e)}
+                />
+                
+              )
         )
         }
+        </article>
         <section className="d-flex home_destination_card_title justify-content-between">
           <h2 className="homeMainContentTitle">
            {basicInfo.destinationName}
@@ -156,7 +161,7 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
               <div>
                 <p>
                   <span className="first_text">Languages</span> <br />
-                  <span className="second_text">{basicInfo.language}</span>
+                  <span className="second_text">{basicInfo.language.join(" , ")}</span>
                 </p>
               </div>
             </article>
@@ -202,10 +207,19 @@ const ContainerDestination: React.FC<ContainerDestinationProps> = ({
         <p className="expore_more_home">Explore more </p>
         <div className="explore_flex_container">
           <section className=" d-flex exporeMoreHomePage">
-            <ExporeMoreAbout img="/assets/img/culture.png" text="Cultures" />
-            <ExporeMoreAbout img="/assets/img/historic.svg" text="History" />
-            <ExporeMoreAbout img="/assets/img/thing_to_do.svg" text="Things to do" />
-            <ExporeMoreAbout img="/assets/img/pratical-info.png" text="Pratical info" />
+            <Link to={`/destination/cultury/${componentData.id}`}>
+               <ExporeMoreAbout img="/assets/img/culture.png" text="Cultures" />
+            </Link>
+            <Link to={`/destination/history/${componentData.id}`}>
+              <ExporeMoreAbout img="/assets/img/historic.svg" text="History" />
+            </Link>
+            <Link to={`/destination/activity/${componentData.id}`}>
+                 <ExporeMoreAbout img="/assets/img/thing_to_do.svg" text="Things to do" />
+            </Link>
+             <Link to={`/destination/usefull-info/${componentData.id}`}>
+                 <ExporeMoreAbout img="/assets/img/pratical-info.png" text="Pratical info" />
+             </Link>
+           
           </section>
           <section className="see_more">
           <Link to={`/destination/overview/${componentData.id}`}

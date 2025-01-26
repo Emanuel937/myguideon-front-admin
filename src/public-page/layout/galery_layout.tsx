@@ -1,4 +1,4 @@
-import React from "react";
+  import React from "react";
 import DestinationInfoTemplate from "./destination-poup-up-template";
 
 // Définition des types pour les props

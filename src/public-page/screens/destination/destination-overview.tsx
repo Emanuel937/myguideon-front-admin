@@ -38,10 +38,9 @@ const DestinationOverviewPage = ()=>{
         }
         const responseData = await response.json();
   
-        var data = responseData[0];
+        var data = responseData;
         var basicInfo = JSON.parse(data.basic_info);
         var gallery   = JSON.parse(data.gallery);
-        gallery       =  gallery.slice(0, 8);
   
         setData({
           imageCover:data.imageCover,
@@ -66,7 +65,7 @@ const DestinationOverviewPage = ()=>{
                     <DestinationPreviewGalery 
                        data={data}
                     />
-                    <MixDestinationLayout data={data.basicInfo}/>
+                  { <MixDestinationLayout data={data.basicInfo}/>}
                 </div>
             </div>)
 }

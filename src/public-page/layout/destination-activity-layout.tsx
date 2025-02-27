@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DestinationInfoTemplate from './destination-poup-up-template';
+import HOSTNAME_WEB from '../../admin/constants/hostname';
 
 // reorganize this after .....
 
@@ -64,6 +65,30 @@ const CategoriesActivityCardCompoents:React.FC<CategoriesActivityCardCompoentsIn
     )
 }
 const ActivitiesContent = ()=>{
+    const id = 1;
+    const [data, setData] = useState([]);
+
+
+    const fetchData  = async()=>{
+        const response  =  fetch(`${HOSTNAME_WEB}/activities/${id}`)
+        .then((response)=>{
+            if(!response.ok){
+                throw('there is an error')
+            }
+            return response.json();
+        }
+        ).then((response)=>{
+                setData(response);
+        })
+
+    }
+
+    useEffect(()=>{
+        fetchData();
+
+    }, []);
+
+    
     return (
         <article>
             <section className='section_section_categoires'>
@@ -104,56 +129,6 @@ const ActivitiesContent = ()=>{
                     activiesRating={'5.0'}
                     activiesPrice={"250€"}
                 />
-                   <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_2.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                   <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_3.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                   <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_4.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                   <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_2.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                  <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_4.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                  <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"scuba.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-                  <CategoriesActivityCardCompoents
-                    activitiesName="Scuba Diving"
-                    cardCover={"cat_3.png"}
-                    activityTotalRating = {20}
-                    activiesRating={'5.0'}
-                    activiesPrice={"250€"}
-                />
-              
                 
             </section>
         </article>

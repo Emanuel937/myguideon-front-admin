@@ -12,17 +12,19 @@ import NotFoundPage from "../public-page/screens/notfound";
 import IndexAdmin from '../admin/index';
 import PrivateRoute from './privateroute'; // Import PrivateRoute
 import Login from "../admin/screens/login";
+import SearchOnMap from '../public-page/screens/destination/search_map';
 
 const routes = [
   { path: '/', element: <HomePage /> },
-  { path: '/destination/maps/details/:id', element: <DestinationMapsDetails /> },
-  { path: '/destination/culture/:id', element: <DestinationCulturePage /> },
-  { path: '/destination/activity/:id', element: <DestinationActivityPage /> },
-  { path: '/destination/overview/:id', element: <DestinationOverviewPage /> },
-  { path: '/destination/gallery/:id', element: <DestinationGalleryPage /> },
-  { path: '/destination/history/:id', element: <DestinationHistoriquePage /> },
+  { path: '/destination/maps/details/:destinationID/:id', element: <DestinationMapsDetails /> },
+  { path: '/destination/cultury/:id',      element: <DestinationCulturePage /> },
+  { path: '/destination/activity/:id',     element: <DestinationActivityPage /> },
+  { path: '/destination/overview/:id',     element: <DestinationOverviewPage /> },
+  { path: '/destination/gallery/:id',      element: <DestinationGalleryPage /> },
+  { path: '/destination/history/:id',      element: <DestinationHistoriquePage /> },
   { path: '/destination/usefull-info/:id', element: <DestinationPraticalInformationPage /> },
-  { path: '/destination/review/:id', element: <DestinationReviewsPage /> },
+  { path: '/destination/review/:id',       element: <DestinationReviewsPage /> },
+  {path:  '/map/search/:id',               element:<SearchOnMap/>},
    
   // Admin path
   { path: '/admin/login', element: <Login /> },

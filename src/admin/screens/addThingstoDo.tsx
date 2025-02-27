@@ -7,7 +7,7 @@ interface AddThingsToDoFormProps {
   }
 
 const AddTingstoDo:React.FC<AddThingsToDoFormProps>  = ({index})=>{
-    return (<AddThingsToDoForm index={index}/>);
+    return (<AddThingsToDoForm index={index} destinationID={null} updatedData={null}/>);
 }
 
 export default AddTingstoDo;

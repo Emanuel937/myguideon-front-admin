@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AppContext } from "../../main";
 import {
   Box,
   Grid,
-  Typography,
   Button,
   IconButton,
   List,
@@ -15,7 +15,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
-import ImageUploader from "./uploadImage"; // Le composant d'upload que vous avez fourni
+import { Alert, Typography } from "@mui/joy";
 import HOSTNAME_WEB from "../constants/hostname";
 
 interface MediaItem {
@@ -23,124 +23,217 @@ interface MediaItem {
   name: string;
   type: "image" | "video";
   url: string;
-  isCover: boolean; // Nouvelle propriété pour indiquer si l'élément est défini comme "cover"
-  file: File; // Fichier réel pour l'envoi au serveur
+  isCover: boolean;
+  file: File;
 }
 
 
-type basicPros = number | null ;
 
-const Media =  ({ index = null }: { index?: basicPros })  => {
-  const [mediaList, setMediaList]          = useState<MediaItem[]>([]);
-  const [viewMode, setViewMode]            = useState<"grid" | "list">("grid");
-  const [coverId, setCoverId]              = useState<string | null>(null); // ID de l'image "cover"
-  var destinationId: number | null         = null;
-  destinationId                            =  Number(localStorage.getItem('destinationId'));
-  const [coverName, setCoverName]          = useState(" ");
+type BasicProps = number | null;
 
-  // Charger les fichiers stockés dans la session au démarrage
+const Media = ({ index = null }: { index?: BasicProps }) => {
+
+
+  var formData = new FormData();
+
+  // Context
+  const context = useContext(AppContext);
+
+  if (!context) {
+    throw new Error("Galery doit être utilisé dans AppContext.Provider");
+  }
+
+  const { setSubmitFunction }     = context;
+
+  // States
+  const [mediaList, setMediaList] = useState<MediaItem[]>([]);
+  const [viewMode, setViewMode]   = useState<"grid" | "list">("grid");
+  const [coverId, setCoverId]     = useState<string | null>(null);
+  const [coverName, setCoverName] = useState<string>("");
+  const [error, setError]         = useState(false);
+  const [ghostMediaLiast, setGhostMediaList] =  useState<MediaItem[]>([]);
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+
+
+  // Récupérer `destinationId` depuis le localStorage
+  const storedId                 = localStorage.getItem("destinationId");
+  const destinationId            = storedId ? Number(storedId) : null;
+
+  // Charger les fichiers depuis `sessionStorage`
   useEffect(() => {
-    // get the destinationId
-
     const savedMedia = sessionStorage.getItem("mediaList");
     if (savedMedia) {
       setMediaList(JSON.parse(savedMedia));
     }
   }, []);
 
-  // Sauvegarder dans la session chaque fois que `mediaList` change
+  // Sauvegarder `mediaList` dans `sessionStorage`
   useEffect(() => {
     sessionStorage.setItem("mediaList", JSON.stringify(mediaList));
-    
   }, [mediaList]);
 
-  const handleUpload = (file: File | null) => {
-    if (!file) return;
+  // Fonction pour gérer l'upload
+  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const newMedia: MediaItem = {
+          id: `${Date.now()}-${file.name}`,
+          name: file.name,
+          type: file.type.startsWith("image") ? "image" : "video",
+          url: URL.createObjectURL(file),
+          isCover: false,
+          file,
+        };
 
-    const newMedia: MediaItem = {
-      id: `${Date.now()}-${file.name}`,
-      name: file.name,
-      type: file.type.startsWith("image") ? "image" : "video",
-      url: URL.createObjectURL(file), // Génère une URL locale pour afficher le fichier
-      isCover: false, // Par défaut, aucun fichier n'est "cover"
-      file, // Stocke le fichier réel pour l'envoi
-    };
-
-    setMediaList((prev) => [...prev, newMedia]);
+        setMediaList((prev) => [...prev, newMedia]);
+      });
+    }
   };
 
   const handleDelete = (id: string) => {
-    setMediaList((prev) => prev.filter((item) => item.id !== id));
+    const item = mediaList.find((media) => media.id === id);
+    if (item) {
+      setDeletedImages((prev) => [...prev, item.url]);  // Ajouter l'URL de l'image supprimée
+    }
+    setMediaList((prev) => prev.filter((media) => media.id !== id));
+  
     if (id === coverId) {
-      setCoverId(null); // Supprimer la couverture si elle est supprimée
+      setCoverId(null);
+      setCoverName("");
     }
+    console.log(deletedImages);
   };
-  const handleSetCover = (id: string) => {
-    setCoverId(id); // Mettre à jour uniquement l'ID de couverture
-    setMediaList((prev) =>
-      prev.map((item) => {
-      if(item.id == id){
-        setCoverName(item.name);
-      }
-      return ({
-        ...item,
-        isCover: item.id === id,
-      })
-    }
-    )
-    );
-  };
-  const handleSubmit = async () => {
-    try {
-      const formData = new FormData();
-      mediaList.forEach((item) => {
-        formData.append("files", item.file); // Ajouter le fichier
-        formData.append("names", item.name); // Ajouter le nom
-      });
-      if (coverId) {
-        formData.append("cover", coverName); // Inclure le nom du fichier défini comme couverture
-      }
-      
-      if(index == null){
-        destinationId = destinationId;
-        
-      }else{
-        destinationId = index;
-      }
-      
-      const response = await fetch(`${HOSTNAME_WEB}/destination/update/gallery/${destinationId}`, {
-        method: "POST",
-        body: formData,
-      });
   
-      if (response.ok) {
-        setMediaList([]);
-        sessionStorage.removeItem("mediaList");
-        setCoverId(null);
-      } else {
-        throw new Error("Erreur lors de l'envoi des fichiers.");
-      }
-    } catch (error) {
-      console.error("Erreur :", error);
 
+  // Fonction pour définir une image comme couverture
+  const handleSetCover = (id: string) => {
+    const coverItem = mediaList.find((item) => item.id === id);
+    if (coverItem) {
+      setCoverName(coverItem.name);
+      setCoverId(id);
+      setMediaList((prev) =>
+        prev.map((item) => ({
+          ...item,
+          isCover: item.id === id,
+        }))
+      );
     }
   };
+
+  const handleGallery = (id:any)=>{
+
+    const response = fetch(`${HOSTNAME_WEB}/destination/${id}`)
+    .then((response)=>{
+      if(!response.ok){
+        throw new Error(" there is an error");
+      }
+      return response.json();
+    })
+    .then((response)=>{
+
+      var initGalleryArray = JSON.parse(response.data.gallery);
+
+      
+        var test = initGalleryArray.map((e: any, index: number) => ({
+          id: index,
+          name: `${Date.now()}-${index}`,
+          url: e,
+          type:'image'
+        }))
+      
+
+      setMediaList([...test]);
+      console.log('data data :', mediaList);
+
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  }
+
+
+
+  // Fonction d'envoi des fichiers au serveur
+  const handleSubmit = async () => {
+
+    if (mediaList.length <= 7) {
+      setError(true); // Affiche l'erreur si moins de 7 fichiers
+      return false;
+    }
+    setError(false); 
+
+    if (true) {
+      setError(false);
+      try {
+      
+        mediaList.forEach((item) => {
+          formData.append("files", item.file);
+          formData.append("names", item.name);
+        });
+
+        if (coverId) {
+          formData.append("cover", coverName);
+        }
+
+        formData.append("deletedImages", JSON.stringify(deletedImages));
+        
+        const idToUse = index == null ? destinationId : index;
+        const response = await fetch(
+          `${HOSTNAME_WEB}/destination/update/gallery/${idToUse}`,
+          {
+            method: "POST",
+            body: formData,
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+         
+        console.log('data before go to database is :', setMediaList);
+        if (response.ok) {
+          setMediaList([]);
+          sessionStorage.removeItem("mediaList");
+          setCoverId(null);
+          setCoverName("");
+        } else {
+          throw new Error("Erreur lors de l'envoi des fichiers.");
+        }
+      } catch (error) {
+        console.error("Erreur :", error);
+      }
+      setError(false);
+    }
+  };
+
+  // Associer `handleSubmit` au contexte au montage
+  useEffect(() => {
+    setSubmitFunction(() => handleSubmit);
+  }, [formData]);
   
+
+
+  useEffect(() => {
+    if (index != null) { 
+        handleGallery(index);
+    }
+}, [index]); // ✅ Ne dépend que de index, pas de mediaList
+
+useEffect(() => {
+  console.log("Updated mediaList:", mediaList);
+}, [mediaList]);
+
+
 
   return (
     <Box sx={{ p: 2, bgcolor: "#f9f9f9", borderRadius: 2, position: "relative" }}>
-  
-
       {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h6">Media Library</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 5 }}>
+        <Box sx={{ mt: 3 }}>
+          <Alert color="warning">
+            *** Vous devez uploader au moins 8 photos :
+          </Alert>
+        </Box>
         <Box>
           <Button
             startIcon={<ViewModuleIcon />}
@@ -158,31 +251,35 @@ const Media =  ({ index = null }: { index?: basicPros })  => {
           >
             List
           </Button>
-              {/* Bouton Submit en haut */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        sx={{
-          zIndex: 1000,
-        }}
-        disabled={mediaList.length === 0} // Désactiver si aucun média
-      >
-        Submit
-      </Button>
         </Box>
       </Box>
 
       {/* Uploader */}
       <Box sx={{ mb: 3 }}>
-        <ImageUploader label="Upload Media" onFileSelect={handleUpload} />
+        <input
+          type="file"
+          multiple
+          onChange={handleUpload}
+          style={{ display: "none" }}
+          id="upload-input"
+        />
+        <label htmlFor="upload-input">
+          <Button variant="outlined" component="span">
+            Upload Media
+          </Button>
+        </label>
       </Box>
+      {error == true && (
+        <Typography sx={{ color: "red" }}>
+          **** Vous devez uploader au moins 8 photos....
+        </Typography>
+      )}
 
       {/* Media Display */}
       {viewMode === "grid" ? (
         <Grid container spacing={2}>
           {mediaList.map((item) => (
-            <Grid item xs={6} sm={4} md={5} key={item.id}>
+            <Grid item xs={2} sm={3} md={3} key={item.id}>
               <Box
                 sx={{
                   position: "relative",
@@ -195,26 +292,15 @@ const Media =  ({ index = null }: { index?: basicPros })  => {
               >
                 {item.type === "image" ? (
                   <img
-                    src={item.url}
+                    src={item.url.startsWith("/") ? `${HOSTNAME_WEB}${item.url}`:item.url}
                     alt={item.name}
-                    style={{
-                      width: "100%",
-                      height: "200px",
-                      display: "block",
-                    }}
+                    style={{ width: "100%", height: "200px", display: "block" }}
                   />
                 ) : (
-                  <video
-                    src={item.url}
-                    controls
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      display: "block",
-                    }}
-                  />
+                  <video src={item.url} controls style={{ width: "100%" }} />
                 )}
-                {/* Checkbox pour définir comme "cover" */}
+
+                {/* Checkbox Cover */}
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -232,6 +318,7 @@ const Media =  ({ index = null }: { index?: basicPros })  => {
                     px: 1,
                   }}
                 />
+
                 {/* Bouton Supprimer */}
                 <IconButton
                   sx={{
@@ -251,31 +338,14 @@ const Media =  ({ index = null }: { index?: basicPros })  => {
       ) : (
         <List>
           {mediaList.map((item) => (
-            <ListItem
-              key={item.id}
-              secondaryAction={
-                <IconButton edge="end" onClick={() => handleDelete(item.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              }
-            >
-              <Avatar
-                variant="square"
-                src={item.url}
-                alt={item.name}
-                sx={{ width: 56, height: 56, mr: 2 }}
-              />
+            <ListItem key={item.id} secondaryAction={
+              <IconButton edge="end" onClick={() => handleDelete(item.id)}>
+                <DeleteIcon />
+              </IconButton>
+            }>
+              <Avatar variant="square" src={item.url} alt={item.name} sx={{ width: 40, height: 40, mr: 2 }} />
               <ListItemText primary={item.name} />
-              {/* Checkbox pour définir comme "cover" */}
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={item.id === coverId}
-                    onChange={() => handleSetCover(item.id)}
-                  />
-                }
-                label="Cover"
-              />
+              <FormControlLabel control={<Checkbox checked={item.id === coverId} onChange={() => handleSetCover(item.id)} />} label="Cover" />
             </ListItem>
           ))}
         </List>

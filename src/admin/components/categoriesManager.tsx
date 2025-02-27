@@ -268,24 +268,29 @@ const CategoryManager: React.FC = () => {
         )}
         {!mode && (
           <div>
-            <Box
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-between"
-              sx={{ marginBottom: 3 }}
-            >
-              <Typography variant="h5" sx={{ marginLeft: 2 }}>
-                Liste des Catégories
-              </Typography>
-              <button
-                className="btn bg-primary text-white"
-                onClick={() => setMode(true)}
-                style={{ padding: '10px 15px', borderRadius: '5px', border: 'none' }}
-              >
-                + Add new category
-              </button>
-            </Box>
+            <Box display="flex" justifyContent="space-between" sx={{
+                  backgroundColor: 'white',
+                  padding: '5px',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  marginBottom: '40px',
+                  width: '100%',
+                }}>
+              
+                 
+                    <Typography variant="h5" className="m-2" sx={{ fontSize: '15px', paddingTop: '10px' }}>
+                     Liste de categories
+                    </Typography>
+                    <Button
+                      type="submit"
+                      className="btn border text-white m-2 bg-primary"
+                      onClick={() => setMode(true)}  // Appel de la fonction de sauvegarde
+                     // Désactivation du bouton pendant le chargement
+                    >
+                      + Add new categories 
+                    </Button>
+                
+                </Box>
             <TableContainer component={Paper} sx={{ marginTop: 2 }}>
               <Table>
                 <TableHead>

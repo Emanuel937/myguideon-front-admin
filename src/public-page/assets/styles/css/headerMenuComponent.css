@@ -2,14 +2,19 @@
 /* Dans le fichier App.css ou un autre fichier CSS global */
 
 /* Appliquez la police à tout le document */
-body {
-  font-family: 'Poppins', sans-serif;
+
+/* Header Styles */
+body{
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.5);
+}
+header {
+    background: #fff;
+    border-bottom: 1.5px solid #d3d3d35e;
 }
 
 nav {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
     
 }
 
@@ -61,7 +66,7 @@ nav {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 11px;
     line-height: 20px;
     /* identical to box height */
     text-align: center;
@@ -100,7 +105,7 @@ nav {
     font-family: 'Montserrat';
     font-style: normal;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 17px;
     /* identical to box height */
     color: #000000;
@@ -147,4 +152,9 @@ nav {
 
 .userAvatar img{
     width: 100%;
+}
+
+
+.navigationStyle{
+    padding-top: 18px;
 }

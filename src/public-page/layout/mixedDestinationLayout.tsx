@@ -1,5 +1,8 @@
 import React, {useEffect, useState}  from 'react';
 import MapComponent from '../components/map_component';
+import { Link } from 'react-router-dom';
+import { setMaxIdleHTTPParsers } from 'http';
+import HOSTNAME_WEB from '../../admin/constants/hostname';
 
 
 interface DestinationInfo {icon:string, title:string, description:string}
@@ -8,6 +11,18 @@ interface ExporeMoreAboutInterface {img:string, text:string }
 const MixDestinationLayout = (data: any) => {
   
   var data= data.data;
+  
+  type pathStatus = null |string
+  const [pathMeteoPath, setPathMeteoPath] = useState<pathStatus>(null);
+
+  useEffect(()=>{
+
+    console.log("path set is :", data);
+    console.log("imgpath is:", data?.imgpath);
+
+    setPathMeteoPath(data?.imgpath);
+
+  })
 
     return (
         <div id="Mix">
@@ -23,52 +38,66 @@ const MixDestinationLayout = (data: any) => {
                      <DestinationInfo
                         icon="global.svg"
                         title="Languages"
-                        description={data.language?.join(" , ")}
+                        description= {Array.isArray(data?.language) && data?.language.length >= 1
+                          ? data?.language.join(" , ")
+                          : data?.language}
                     />
                      <DestinationInfo
                         icon="dollarpack.svg"
-                        title="Budget Required for a Trip"
-                        description={`${data?.budget} ${data?.currency} for a every week spent`}
+                        title="Budget "
+                        description={`${data?.budget} ${" "} for a every week spent`}
                     />
                    
                 </div>
                 </div>
-                <div>
+                <div style={{display:'none'}}>
                   <OverallRating/>
            
                 </div>
             </div>
+            { pathMeteoPath != null &&
             <section className="meteo">
                 <img 
-                    src="/assets/img/meteo.png"
+                    src={`${HOSTNAME_WEB}${pathMeteoPath}`}
                 />
             </section>
+            }
             <section>
-              <h3>DESTINATION DETAILS & RATINGS</h3>
-              <h4>Explore More about Maldives</h4>
-               <section className='d-flex'>
-                  <ExporeMoreAbout
-                    img="/assets/img/culture.png"
-                    text="Cultures"
-                  />
+              <h3 className='moreExploreDestination mt-5'>Explore More About the Destination</h3>
+               <section className='d-flex justify-content-around'>
+                  <Link to={`/destination/cultury/${data?.id}`} style={{display:'none'}}>
+                    <ExporeMoreAbout
+                        img="/assets/img/culture.png"
+                        text="Cultures"
+                      />
+                  </Link>
+                  <Link to={`/destination/activity/${data?.id}`}>
                   <ExporeMoreAbout
                     img="/assets/img/thing-to-do.png"
                     text="Things to do"
                   />
+                    </Link>
+                  <Link to={`/destination/pratique-info/${data?.id}`}>
                   <ExporeMoreAbout
                     img="/assets/img/pratical-info.png"
                     text="Pratical info"
                   />
+                  </Link>
+                  <Link to={`/destination/gallery/${data?.id}`}  style={{display:'none'}}>
                   <ExporeMoreAbout
                     img="/assets/img/galery.png"
                     text="Gallery"
                   />
+                  </Link>
+                  <Link to={`/destination/review/${data?.id}`} style={{display:'none'}}>
                     <ExporeMoreAbout
                       img="/assets/img/rating.png"
                       text="Notation"
                   />
+                  </Link>
+
                </section>
-               <h4>Explore the Map</h4>
+               <h3 className='mb-5 mt-5'>Explore the Map</h3>
                <div className='map_right_margin'>
                   <MapComponent height='50vh'/>
                </div>
@@ -142,6 +171,15 @@ const OverallRating = () => {
     );
   };
 
+const Meteo = ()=>{
+  return (<article className='meteoCard'>
+    <div>
+        <p> mois</p>
+        <p> Dégrée </p>
+    </div>
+
+  </article>)
+}
 export   {ExporeMoreAbout};
 export default MixDestinationLayout;
 

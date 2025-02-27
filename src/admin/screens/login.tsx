@@ -1,28 +1,10 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Link,
-  Paper,
-} from "@mui/material";
+import { Box, Button, TextField, Typography, Link, Paper,  IconButton, InputAdornment, } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import HOSTNAME_WEB from "../constants/hostname";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-// Type pour les données utilisateur
-interface User {
-  id: number;
-  name: string;
-}
-
-// Type pour la réponse du serveur
-interface ServerResponse {
-  success: boolean;
-  user?: User;
-  message?: string;
-}
 
 const LoginContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -50,190 +32,200 @@ const ErrorText = styled(Typography)(({ theme }) => ({
 }));
 
 const Login: React.FC = () => {
-  const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [forgotEmail, setForgotEmail] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [step, setStep] = useState(1);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const [isFirstTime, setIsFirstTime]  = useState(false);
+  const[confirmPassword ,setConfirmPassword] = useState("");
+  const [errorPassword, setErrorPassword]    =  useState(false);
 
-  const handleLogin = async (event: React.FormEvent): Promise<void> => {
+  const handleForgotPassword = async (event: React.FormEvent) => {
     event.preventDefault();
-    setErrorMessage(""); // Réinitialiser le message d'erreur
-  
-    const requestData = { email, password };
-  
+    setErrorMessage("");
     try {
-      // Envoyer une requête POST au serveur
-      const response = await fetch(`${HOSTNAME_WEB}/profil/login`, {
+      const response = await fetch(`${HOSTNAME_WEB}/profil/send-reset-code`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Indiquer que le corps de la requête est en JSON
-        },
-        body: JSON.stringify(requestData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
       });
-  
-      // Vérifier si la réponse est correcte
-      if (!response.ok) {
-        const errorData = await response.json(); // Lire les données d'erreur renvoyées par le serveur
-        setErrorMessage(errorData.message || "Erreur : mot de passe ou utilisateur invalide");
-        return;
-      }
-  
-      // Lire les données de la réponse
-      const responseData = await response.json();
-       
-      if(responseData){
-        console.log(`user id is  : ${responseData.message}`)
-        localStorage.setItem('userId', responseData.message);
-        navigate("/admin");
-      }
-  
-      // Redirection vers /admin si la connexion est réussie
-  
+
+      if (!response.ok) throw new Error("Erreur lors de l'envoi de la requête.");
+      setStep(2);
     } catch (error) {
-      console.error("Erreur lors de la tentative de connexion :", error);
-      setErrorMessage("Une erreur est survenue. Veuillez réessayer plus tard.");
-    }
-  };
-  
-
-  const handleForgotPassword = async (
-    event: React.FormEvent
-  ): Promise<void> => {
-    event.preventDefault();
-    setErrorMessage(""); // Réinitialiser le message d'erreur
-
-    const requestData = { email: forgotEmail };
-    console.log("Forgot password data:", requestData);
-
-    try {
-      const response: ServerResponse = await fakeServerRequest(requestData);
-
-      if (response.success) {
-        alert("Un e-mail pour réinitialiser votre mot de passe a été envoyé.");
-        setShowForgotPassword(false);
-      } else {
-        setErrorMessage(response.message || "Une erreur est survenue.");
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération du mot de passe :", error);
       setErrorMessage("Une erreur est survenue.");
     }
   };
 
+  const handleVerifyCode = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setErrorMessage("");
+
+    try {
+      const response = await fetch(`${HOSTNAME_WEB}/profil/verify-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, code: resetCode }),
+      });
+
+      if (!response.ok) throw new Error("Code invalide ou expiré.");
+      setStep(3);
+    } catch (error) {
+      setErrorMessage("Une erreur est survenue.");
+    }
+  };
+
+  const handleResetPassword = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setErrorMessage("");
+   if(confirmPassword == newPassword){
+    try {
+      const response = await fetch(`${HOSTNAME_WEB}/profil/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, newPassword }),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la réinitialisation.");
+      setShowForgotPassword(false);
+    } catch (error) {
+      setErrorMessage("Une erreur est survenue.");
+    }
+  }else{
+    setErrorPassword(true);
+  }
+  };
+
+  // Fonction de connexion
+const handleLogin = async (event: React.FormEvent): Promise<void> => {
+  event.preventDefault();
+  setErrorMessage(""); // Réinitialiser le message d'erreur
+
+  const requestData = { email, password };
+
+  try {
+    // Envoyer une requête POST au serveur
+    const response = await fetch(`${HOSTNAME_WEB}/profil/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    // Vérifier si la réponse est correcte
+    if (!response.ok) {
+      const errorData = await response.json(); // Lire les données d'erreur renvoyées par le serveur
+      setErrorMessage(errorData.message || "Erreur : mot de passe ou utilisateur invalide");
+      return;
+    }
+
+    // Lire les données de la réponse
+    const responseData = await response.json();
+
+    if (responseData && responseData.message) {
+      if(responseData.isfirstTime == 'yes'){
+        setIsFirstTime(true);
+        setStep(1);
+        setShowForgotPassword(true);
+      }else{
+        localStorage.setItem("userId", responseData.message);
+        navigate("/admin"); 
+      }
+    } else {
+      setErrorMessage("Réponse du serveur invalide.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la tentative de connexion :", error);
+    setErrorMessage("Une erreur est survenue. Veuillez réessayer plus tard.");
+  }
+};
+
+  
+  
   return (
     <LoginContainer>
       <LoginForm elevation={3}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {showForgotPassword ? "Mot de passe oublié" : "Connexion"}
+        <Typography variant="h6" gutterBottom>
+          {showForgotPassword ? " 👋 Réinitialiser le mot de passe" : " 👋 Connexion"}
         </Typography>
-
+        {isFirstTime && (
+            <Typography fontSize={14}> Salut, bienvenue ! C'est votre première connexion, réinitialisons votre mot de passe. </Typography>)     
+        }
         {!showForgotPassword ? (
-          <form onSubmit={handleLogin}>
-            <TextField
-              label="Adresse e-mail"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              label="Mot de passe"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <form>
+            <TextField label="Adresse e-mail" fullWidth margin="normal" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <TextField label="Mot de passe" fullWidth margin="normal" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ marginTop: 2 }}
-            >
+            <Button variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }} onClick={handleLogin}>
               Se connecter
             </Button>
             <Box mt={2}>
               <Typography variant="body2">
-                <Link
-                  href="#"
-                  onClick={() => setShowForgotPassword(true)}
-                  underline="hover"
-                >
+                <Link href="#" onClick={() => setShowForgotPassword(true)} underline="hover">
                   Mot de passe oublié ?
                 </Link>
               </Typography>
             </Box>
           </form>
-        ) : (
+        ) : step === 1 ? (
           <form onSubmit={handleForgotPassword}>
+            <TextField label="Adresse e-mail" fullWidth margin="normal" type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
+           {/** hide mot de passe */}
+            
+            
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
+              Envoyer le code
+            </Button>
+          </form>
+        ) : step === 2 ? (
+          <form onSubmit={handleVerifyCode}>
+            <TextField label="Code de validation" fullWidth margin="normal" value={resetCode} onChange={(e) => setResetCode(e.target.value)} required />
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
+              Vérifier le code
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleResetPassword}>
+            <TextField label="Nouveau Mot de passe" 
+                        fullWidth margin="normal" 
+                        type="password" 
+                        value={newPassword} 
+                        onChange={(e) => setNewPassword(e.target.value)} 
+            required />
+
             <TextField
-              label="Adresse e-mail"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              type="email"
-              value={forgotEmail}
-              onChange={(e) => setForgotEmail(e.target.value)}
-            />
-            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ marginTop: 2 }}
-            >
+                type={showPassword ? "text" : "password"}
+                label="Confirmer Nouveau Mot de passe"
+                variant="outlined"
+                fullWidth
+                onChange={(e)=> setConfirmPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            { errorPassword  && <p style={{color:'red'}}> le mot de passe ne sont pas identiques </p> }
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
               Réinitialiser le mot de passe
             </Button>
-            <Box mt={2}>
-              <Typography variant="body2">
-                <Link
-                  href="#"
-                  onClick={() => setShowForgotPassword(false)}
-                  underline="hover"
-                >
-                  Retour à la connexion
-                </Link>
-              </Typography>
-            </Box>
           </form>
         )}
       </LoginForm>
     </LoginContainer>
   );
 };
-
-// Fonction simulant une requête serveur (remplacer par une requête API réelle)
-const fakeServerRequest = async (data: {
-  email: string;
-  password?: string;
-}): Promise<ServerResponse> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (data.email === "test@example.com" && data.password === "password") {
-        resolve({ success: true, user: { id: 1, name: "Utilisateur Test" } });
-      } else if (data.email) {
-        resolve({
-          success: false,
-          message: "Email ou mot de passe invalide.",
-        });
-      } else {
-        resolve({ success: false, message: "Une erreur est survenue." });
-      }
-    }, 1000);
-  });
-};
-
-
 
 export default Login;

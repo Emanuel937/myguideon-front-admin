@@ -5,6 +5,9 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import DestinationBasicInfo from './destinationBasicInfo'
 import Media from "./destinationGalery";
+import Culture from '../screens/culture';
+import PratiqueInfo from "../screens/pratique_info";
+import Historical from "../screens/historique";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -53,22 +56,7 @@ export default function HorizontalTabs({ index = null }: { index?: basicPros }){
 
   return (
     <Box display="flex">
-    
       <Box flex={3}>
-          
-      <Typography
-       variant="h2"
-       sx={{fontSize:'25px', fontWeight:'bold', marginBottom:'20px'}}
-      >
-        Add destination & Gallery 
-      </Typography>
-             
-      <Typography
-        sx={{marginBottom:'20px'}}
-      >
-        add destination and its gallery 
-      </Typography>
-    
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -92,23 +80,29 @@ export default function HorizontalTabs({ index = null }: { index?: basicPros }){
         >
           <Tab label="Basic Info" {...a11yProps(0)} />
           <Tab label="Gallery" {...a11yProps(1)} />
-          <Tab label="Culture" {...a11yProps(2)} />
-          <Tab label="Pratique Info" {...a11yProps(2)} />
-          <Tab label="Histoire" {...a11yProps(2)} />
+          <Tab label="Pratique Info" {...a11yProps(3)} />
         </Tabs>
       </Box>
-
       {/* Contenu des panneaux */}
-      <TabPanel value={value} index={0}>
-        <Typography variant="body1">
-         <DestinationBasicInfo index={index}/>
-        </Typography>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Media index={index}/>
-      </TabPanel>
+        <TabPanel value={value} index={0}>
+          <Typography variant="body1">
+          <DestinationBasicInfo index={index}/>
+          </Typography>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Media index={index}/>
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <Culture index={index}/>
+        </TabPanel>
+        <TabPanel value={value} index={3}>
+          <PratiqueInfo index={index}/>
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <Historical index={index}/>
+        </TabPanel>
       </Box>
-      <Box flex={2}>
+      <Box flex={1}>
       </Box>
     </Box>
   );

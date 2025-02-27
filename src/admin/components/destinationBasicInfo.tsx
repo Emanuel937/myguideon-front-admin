@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ImageUploader from "./uploadImage";
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar'; // Pour afficher une alerte temporaire
-import SearchSuggestion from '../components/search_suggestion';
+import SearchSuggestion from './search_suggestion';
 import languagesData from "../constants/lang.json";
+import devices  from  '../constants/devices.json';
+import { AppContext } from '../../main';
+import country from '../constants/country.json';
+import {InputAdornment, Popover, List, ListItem, ListItemText } from "@mui/material";
+
 import {
   Box, TextField, MenuItem,
   Button, Grid
@@ -12,36 +17,107 @@ import HOSTNAME_WEB from '../constants/hostname';
 import axios from "axios";
 import AutoCompleteSuggestion from "./auto_complete_susgestion";
 
+
 interface UploadedImage {
   file: File | null;
   preview: string | null;
 }
 
+interface Currency {
+  code: string;
+  name: string;
+}
+
+
+interface CurrencySelectorProps {
+  formData: FormData;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+
 type BasicProps = number | null;
 
 const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
+
+  // context
+
+  const context = useContext(AppContext); 
+
+
+  if (!context) {
+    throw new Error("DestinationBasicInfo doit être utilisé dans AppContext.Provider");
+  }
+
+  const { setSubmitFunction } = context;
+  
+
+
+  // end of context
+
   const restApiLink = index == null
     ? `${HOSTNAME_WEB}/destination/add/basic/info`
     : `${HOSTNAME_WEB}/destination/update/basic/info/${index}`;
 
   const [formData, setFormData] = useState({
     destinationName: "",
-    language: ["English"],
+    language: [""],
     budget: "",
     currency: "USD",
     status: "Draft",
     address: "",
     categories: " ",
     lon:'',
-    lat:' '
+    lat:' ',
+    imgpath:''
   });
 
+
+  useEffect(() => {
+    setSubmitFunction(() => handleSubmit); // Met à jour la fonction dans le contexte
+  }, [formData]);
+
   const [successAlert, setSuccessAlert]   = useState(false); // État pour l'alerte de succès
-  const [weatherImages, setWeatherImages] = useState<UploadedImage[]>([]);
+  const [weatherImage, setWeatherImage] = useState<UploadedImage>({
+    file: null,
+    preview: null,
+  });
   const [suggestions, setSuggestions]     = useState<any[]>([]);
   const [languages, setLanguages]         = useState<string[]>([]);
   const [categories, setCategories]       = useState<string[]>([]);
   const [langueTags, setLangueTags]       = useState<string[]>([]);
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [filteredCurrencies, setFilteredCurrencies] = useState<{ code: string; name: string }[]>([]);
+
+  // Filtrage des devises en fonction de l'entrée de recherche
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData({ ...formData, currency: value }); // Met à jour formData avec la valeur entrée
+    setSearchTerm(value); // Met à jour le searchTerm pour filtrer les devises
+
+    setFilteredCurrencies(
+      devices.currencies.filter(
+        (currency) =>
+          currency.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          currency.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+  
+  
+
+
+  const isFormValid = () => {
+    return Object.values(formData).every(value => {
+      if (Array.isArray(value)) {
+        return value.length > 0; // Vérifie que les tableaux ne sont pas vides
+      }
+      return value.toString().trim() !== ""; // Vérifie que les autres champs ne sont pas vides
+    });
+  };
+  
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
@@ -66,13 +142,30 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
     setSuggestions([]);
   };
 
-  const handleFileSelect = (file: File | null, type: "weather") => {
-    const preview = file ? URL.createObjectURL(file) : null;
-    setWeatherImages((prev) => [...prev, { file, preview }]);
-  };
 
-  const handleRemoveWeatherImage = (imgIndex: number) => {
-    setWeatherImages((prev) => prev.filter((_, i) => i !== imgIndex));
+  const handleSearchCurrencySelect = (code:any)=>{
+    setFormData({...formData, currency:code});
+    setFilteredCurrencies([]);
+    
+  }
+
+  const handleFileSelect = (file: File | null) => {
+    if (!file) return;
+  
+    const preview = URL.createObjectURL(file);
+    setWeatherImage({ file, preview });
+    setFormData({... formData, imgpath:preview});
+   
+  };
+  
+  
+
+ 
+  const handleRemoveWeatherImage = () => {
+    setWeatherImage({
+      file:null,
+      preview:null
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,9 +175,18 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
  
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+      
+   
+  if (index == null){
+      if(!isFormValid())
+      {
+        alert("Veuillez remplir tous les champs obligatoires !");
+        return;
+      }
+  }
+        
     const data = new FormData();
   
     // Ajouter les données de formulaire (destinationName, budget, etc.)
@@ -94,11 +196,24 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
         value.forEach((val) => {
           data.append(key, val); // Ajouter chaque élément du tableau comme une nouvelle entrée
         });
-      } else {
-        data.append(key, value.toString());
+      }else{
+        data.append(key, value); 
       }
     });
-  
+
+    // adding file image to data array to send the host
+
+    if(weatherImage.file){
+      data.append('weather_image', weatherImage.file );
+    }
+
+
+    // set author data here 
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      data.append('author', userId);
+    }
+
     // Supprimer les doublons dans les tags de langue
     const uniqueLangueTags = Array.from(
       new Set(
@@ -107,21 +222,34 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
         )
       )
     );
-
   
-    // Ajouter les images météo
-    weatherImages.forEach((img, index) => {
-      if (img.file) {
-        data.append(`weatherImage_${index}`, img.file);
-      }
-    });
+    console.log("Images sélectionnées avant ajout à FormData:", data);
   
     try {
       const response = await fetch(restApiLink, {
         method: "POST",
         body: data,
       }).then((res) => {
+
         setSuccessAlert(true);
+
+        if(index == null){
+
+          setFormData({
+          destinationName: "",
+          language: [""],
+          budget: "",
+          currency: "USD",
+          status: "Draft",
+          address: "",
+          categories: " ",
+          lon:'',
+          lat:' ',
+          imgpath:''
+        
+        })
+
+        }
         return res.json();
       });
   
@@ -136,26 +264,33 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
   };
   
   
-  
   const getCurrentDestination = async () => {
     try {
       const response = await fetch(`${HOSTNAME_WEB}/destination/${index}`);
       if (!response.ok) throw new Error('Erreur lors de la récupération');
-
-       var data = (await response.json()).data.basic_info; 
-       data = JSON.parse(data);
-       var lang:any;
-
-      
-    
-      lang = [...new Set(data.language)];
-      setFormData({ ...data});
+  
+      let data = (await response.json()).data.basic_info;
+      data = JSON.parse(data);
+  
+      let lang: any;
+  
+      // Vérification et conversion de `data.language` en tableau
+      if (typeof data.language === 'string') {
+        lang = [data.language.toLowerCase()]; // Convertir en tableau avec la langue en minuscule
+      } else if (Array.isArray(data.language)) {
+        lang = [...new Set(data.language.map((l: string) => l.toLowerCase()))]; // Éliminer les doublons
+      } else {
+        lang = []; // Si le format est inconnu, initialiser un tableau vide
+      }
+  
+      setFormData({ ...data });
       setLangueTags(lang);
-
+  
     } catch (error) {
-      console.error(error);
+      console.error('Erreur lors de la récupération des données :', error);
     }
   };
+  
 
   const fetchCategories = async () => {
     const response = await fetch(`${HOSTNAME_WEB}/categories`)
@@ -203,14 +338,82 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
   // Utilisation de useEffect pour observer les changements de `tags`
   useEffect(() => {
       setFormData({...formData, language:langueTags});
+      console.log(formData);
   }, [langueTags]);
+  
+
+
+  //filter currency
+
+
+    // manager permission
+
+    const [permissions, setPermissions] =  useState("");
+    const [userPrefil, setUserPrefil]   = useState(" ");
+  
+    const handleUserProfil = (userID: any) => {
+  
+      fetch(`${HOSTNAME_WEB}/profil/user_profil/${userID}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Error fetching user profile');
+          }
+          return response.json();
+        })
+        .then((response) => {
+          setUserPrefil(response[0][0].profil_id);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    };
+    
+    const allPermissions = () => {
+      fetch(`${HOSTNAME_WEB}/profil/`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('There is an error');
+          }
+          return response.json();
+        })
+        .then((response) => {
+          console.log(permissions);
+          // Assuming "data.message" is an array and you want to modify it
+          const filteredPermissions = response.message.filter((element:any) =>  {
+            
+            if(element.id.toString() == userPrefil.toString()){
+              return element
+            }
+          
+          }
+        
+        )
+             setPermissions(filteredPermissions[0].permissions);
+        
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+  
+    };
+    
+    useEffect(()=>{
+      console.log("datdd", formData);
+      allPermissions();
+      handleUserProfil(localStorage.getItem('userId'))
+    }, [permissions, userPrefil]);
+  
+
+
+    
+
 
   return (
     <Box>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3} sx={{ marginTop: "10px" }}>
           {/* Nom de la destination */}
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               label="Nom de la destination"
               fullWidth
@@ -220,6 +423,27 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
               required
               sx={{ backgroundColor: "white" }}
             />
+          </Grid>
+            {/* Statut */}
+            <Grid item xs={6}>
+            <TextField
+              label="Statut"
+              fullWidth
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              select
+              required
+            >
+              {[ "Draft", "Pending validation","Published", "Disabled"]
+                .filter((e) => e !== "Published" || permissions.includes("5"))
+                .map((e) => (
+                  <MenuItem key={e} value={e}>
+                    {e}
+                  </MenuItem>
+                ))}
+
+            </TextField>
           </Grid>
 
           <Grid item xs={6}>
@@ -233,7 +457,6 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
               handleChange={handleAutoCompleteChange} // Gestionnaire de changement
             />
           </Grid>
-
           {/* Budget */}
           <Grid item xs={6}>
             <TextField
@@ -242,55 +465,74 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
               name="budget"
               value={formData.budget}
               onChange={handleChange}
-              type="number"
+              type="text"
               sx={{ backgroundColor: "white" }}
               required
             />
           </Grid>
 
           {/* Devise */}
-          <Grid item xs={6}>
-            <TextField
-              label="Devise"
-              fullWidth
-              name="currency"
-              value={formData.currency}
-              onChange={handleChange}
-              select
-              required
-            >
-              <MenuItem value="USD">USD</MenuItem>
-              <MenuItem value="EUR">EUR</MenuItem>
-              <MenuItem value="JPY">JPY</MenuItem>
-              <MenuItem value="GBP">GBP</MenuItem>
-            </TextField>
+          <Grid item xs={6} sx={{ position: "relative" }}>
+              <TextField
+                    label="Devise"
+                    fullWidth
+                    name="currency"
+                    value={formData.currency} // Assurez-vous que formData.currency est lié à ce champ
+                    onChange={handleSearchChange} // Mettre à jour le searchTerm et le formData
+                    required
+                    type="search"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          💸
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                   {/* Suggestions */}
+            {filteredCurrencies.length > 0 && (
+              <ul
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  width: "100%",
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                  padding: 0,
+                  margin: 0,
+                  zIndex: 2000,
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                }}
+              >
+                {filteredCurrencies.map((e) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSearchCurrencySelect(e.code)}
+                    style={{
+                      listStyleType: "none",
+                      cursor: "pointer",
+                      padding: "8px",
+                      background: "#f1f1f1",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    {e.name} - {e.code}
+                  </li>
+                ))}
+              </ul>)}
+                
           </Grid>
 
-          {/* Statut */}
-          <Grid item xs={6}>
-            <TextField
-              label="Statut"
-              fullWidth
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              select
-              required
-            >
-              {["Published", "Disabled", "Draft", "Pending validation"].map((e) => (
-                <MenuItem key={e} value={e}>
-                  {e}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
+        
 
           {/* Adresse */}
           <Grid item xs={6} sx={{ position: "relative" }}>
             <TextField
-              label="Adresse/Location"
+              label="Localisation" 
               fullWidth
-              name="address"
+              name="address" 
               value={formData.address}
               onChange={handleLocationChange}
               sx={{ backgroundColor: "white" }}
@@ -334,8 +576,8 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
 
           <Grid item xs={6}>
             <SearchSuggestion
-              placeholder="Type the categories"
-              queryData={categories}
+              placeholder="Pays"
+              queryData={country.countries}
               name="categories"
               handleChange={handleChange}
               value={formData.categories}
@@ -347,14 +589,14 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
           <Grid item xs={12}>
             <ImageUploader
               label="Ajouter une image météo"
-              onFileSelect={(file) => handleFileSelect(file, "weather")}
+              onFileSelect={(e:any)=> handleFileSelect(e)}
             />
             <Box display="flex" gap={2} flexWrap="wrap">
-              {weatherImages.map((img, index) => (
+              {formData.imgpath && (
                 <Box key={index} position="relative" mt={2}>
                   <img
-                    src={img.preview || ""}
-                    alt={`Weather ${index + 1}`}
+                    src={formData.imgpath?.startsWith("blob:") ? formData.imgpath : `${HOSTNAME_WEB}${formData.imgpath}` || " "}
+                    alt="Weather"
                     style={{
                       width: 100,
                       height: 100,
@@ -365,7 +607,7 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => handleRemoveWeatherImage(index)}
+                    onClick={() => handleRemoveWeatherImage}
                     sx={{
                       position: "absolute",
                       top: 0,
@@ -375,16 +617,11 @@ const DestinationBasicInfo = ({ index = null }: { index?: BasicProps }) => {
                     X
                   </Button>
                 </Box>
-              ))}
+              )}
             </Box>
           </Grid>
 
           {/* Soumettre */}
-          <Grid item xs={12} mt={3}>
-            <Button type="submit" variant="contained" sx={{ backgroundColor: "#293746" }}>
-              {index ? "Mettre à jour" : "Enregistrer"} les informations
-            </Button>
-          </Grid>
         </Grid>
       </form>
 

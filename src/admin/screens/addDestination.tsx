@@ -1,5 +1,5 @@
 import React from 'react';
-import VerticalTabs from '../components/destinationHorizontalTab';
+import VerticalTabs from '../components/destination_tab';
 
 const AddDestinatinion = ()=>{
     return <VerticalTabs/>

@@ -78,3 +78,18 @@
     color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
     text-decoration: none;
   }
+
+  .MuiTabs-scroller.MuiTabs-fixed.css-s2t35c-MuiTabs-scroller{
+    margin-bottom: 30px;
+  }
+
+
+  .css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.MuiSelect-select {
+    height: auto;
+    min-height: 1.4375em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+   
+    color: black;
+  }
